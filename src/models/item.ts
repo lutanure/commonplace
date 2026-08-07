@@ -1,14 +1,21 @@
 import type { Tag } from './tag';
 
 // What the saved information *is*, independent of how it entered the app.
+// 'other' is the deliberate escape hatch for anything not covered by the
+// built-in list — paired with `customTypeLabel` below.
 export type ItemType =
-  | 'article'
-  | 'note'
   | 'idea'
-  | 'product'
+  | 'note'
+  | 'article'
+  | 'book'
   | 'movie'
+  | 'tv_show'
   | 'song'
+  | 'podcast'
+  | 'product'
   | 'place'
+  | 'recipe'
+  | 'quote'
   | 'image'
   | 'other';
 
@@ -32,6 +39,10 @@ export interface Item {
   id: string;
   title: string;
   type: ItemType;
+  // User-defined label shown when type === 'other', e.g. 'Research Paper'.
+  // Keeps ItemType a closed, analyzable set while still letting a user
+  // name something it doesn't cover.
+  customTypeLabel?: string;
   category?: ItemCategory;
   createdAt: string;
   updatedAt: string;

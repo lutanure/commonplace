@@ -21,19 +21,33 @@ that are populated differently depending on what was saved and how far AI proces
 Fields are grouped by where the data comes from:
 
 ### Identity — always present, defines what the item fundamentally is
-- `id`, `title`, `type`, `category`, `createdAt`, `updatedAt`
+- `id`, `title`, `type`, `customTypeLabel?`, `category`, `createdAt`, `updatedAt`
 
-**`type` is what the knowledge *is*, not how it arrived.** It's a fixed union — `article`, `note`,
-`idea`, `product`, `movie`, `song`, `place`, `image`, `other` — describing the semantic identity of
-the saved information. A movie recommendation is `type: 'movie'` whether it was captured as a
-screenshot, a pasted text message, or typed in by hand; the capture mechanism never leaks into
-`type`. This is deliberately kept separate from `captureType` (below) — see "Item type vs capture
-type" for why that split matters.
+**`type` is what the knowledge *is*, not how it arrived.** It's a fixed union of built-in semantic
+types — `idea`, `note`, `article`, `book`, `movie`, `tv_show`, `song`, `podcast`, `product`,
+`place`, `recipe`, `quote`, `image`, `other` — describing the semantic identity of the saved
+information. A movie recommendation is `type: 'movie'` whether it was captured as a screenshot, a
+pasted text message, or typed in by hand; the capture mechanism never leaks into `type`. This is
+deliberately kept separate from `captureType` (below) — see "Item type vs capture type" for why
+that split matters.
 
-`category` is a plain `string`, not an enum, and is separate from `type` on purpose: a `movie` item
-might be categorized as `entertainment`, a `product` as `shopping`, and so on. Category is where
-subject/topic classification lives, and it needs to stay open-ended since it may eventually be
-AI-generated or user-defined — an enum would force a premature, closed vocabulary.
+`type` stays a closed union on purpose, even though the list of things people want to save is
+open-ended (a research paper, a wine, a workout, an interior-design reference...). A closed set is
+what makes `type` useful for search, filtering, AI prompting, and analytics later — "show me all my
+movies" or "how many books did I save this year" only works if `movie`/`book` are stable, countable
+values rather than arbitrary free text. `'other'` is the deliberate escape hatch: when none of the
+built-in types fit, `type: 'other'` plus a `customTypeLabel` (e.g. `'Research Paper'`) lets the user
+name the thing without forcing a fixed vocabulary to grow unboundedly or forcing category (which
+already is free text — see below) to carry two jobs at once. `customTypeLabel` is only meaningful
+when `type === 'other'`; it's ignored/absent for every built-in type.
+
+This is different from `category`, which is *always* free text regardless of `type` — `category` is
+the open-ended subject/topic classification (`entertainment`, `shopping`, ...), while `type` and
+`customTypeLabel` together are the semantic-identity classification. A `movie` can be `category:
+'entertainment'`; an `other` + `customTypeLabel: 'Wine'` item can be `category: 'gifts'`. They don't
+compete with each other. `category` remains a plain `string`, not an enum, since it may eventually
+be AI-generated or user-defined and shouldn't be constrained to a fixed vocabulary the way `type`
+deliberately is.
 
 ### Source / original content — comes from the original saved thing
 - `captureType`, `sourceName?`, `sourceUrl?`, `mediaUri?`, `originalText?`

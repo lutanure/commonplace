@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMemo, useState } from 'react';
 import {
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -8,46 +9,110 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import type { Item } from '../models';
+import type { Item, ItemType } from '../models';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
 import { generateLocalId } from '../utils/id';
+import { getItemTypeLabel } from '../utils/itemTypeLabel';
 import { parseTagsInput } from '../utils/tags';
+import { normalizeTypeKey, searchItemTypes } from '../utils/typeTaxonomy';
 import { normalizeUrl } from '../utils/url';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddItem'>;
 
-type CaptureOption = 'idea' | 'note' | 'link';
-
-const CAPTURE_OPTIONS: { value: CaptureOption; label: string }[] = [
-  { value: 'idea', label: 'Idea' },
-  { value: 'note', label: 'Note' },
-  { value: 'link', label: 'Link' },
-];
+// Sensible per-type wording for the shared content field — not a unique
+// form per type, just a friendlier label/placeholder where it's easy.
+const CONTENT_FIELD: Partial<Record<ItemType, { label: string; placeholder: string }>> = {
+  idea: { label: 'Idea', placeholder: "What's the idea?" },
+  note: { label: 'Note', placeholder: "What's on your mind?" },
+  quote: { label: 'Quote', placeholder: 'The quote itself' },
+};
+const DEFAULT_CONTENT_FIELD = {
+  label: 'Notes',
+  placeholder: 'Any details worth remembering',
+};
 
 export default function AddItemScreen({ navigation }: Props) {
-  const { addItem } = useItems();
+  const { items, addItem } = useItems();
 
-  const [option, setOption] = useState<CaptureOption>('idea');
+  const [type, setType] = useState<ItemType>('idea');
+  const [customTypeLabel, setCustomTypeLabel] = useState('');
+  const [typePickerVisible, setTypePickerVisible] = useState(false);
+  const [typeQuery, setTypeQuery] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [url, setUrl] = useState('');
+  const [sourceUrlInput, setSourceUrlInput] = useState('');
   const [category, setCategory] = useState('');
   const [tagsInput, setTagsInput] = useState('');
 
-  const normalizedUrl = useMemo(() => normalizeUrl(url), [url]);
+  const trimmedTitle = title.trim();
+  const trimmedContent = content.trim();
+  const trimmedUrl = sourceUrlInput.trim();
+  const hasUrlInput = trimmedUrl.length > 0;
 
-  const isValid = useMemo(() => {
-    if (option === 'link') {
-      return normalizedUrl !== null;
+  const normalizedUrl = useMemo(
+    () => (hasUrlInput ? normalizeUrl(trimmedUrl) : null),
+    [hasUrlInput, trimmedUrl]
+  );
+  const urlIsValid = !hasUrlInput || normalizedUrl !== null;
+  const contentField = CONTENT_FIELD[type] ?? DEFAULT_CONTENT_FIELD;
+
+  const typeSearch = useMemo(
+    () => searchItemTypes(typeQuery, items),
+    [typeQuery, items]
+  );
+  const trimmedTypeQuery = typeQuery.trim();
+  const canCreateType = trimmedTypeQuery.length > 0 && !typeSearch.exactMatch;
+
+  const validationMessage = useMemo(() => {
+    if (!urlIsValid) {
+      return 'Enter a valid web address, e.g. example.com';
     }
-    return title.trim().length > 0 && content.trim().length > 0;
-  }, [option, title, content, normalizedUrl]);
+    if (!hasUrlInput && (trimmedTitle.length === 0 || trimmedContent.length === 0)) {
+      return 'Title and content are required.';
+    }
+    return null;
+  }, [urlIsValid, hasUrlInput, trimmedTitle, trimmedContent]);
+
+  const isValid = validationMessage === null;
+
+  function openTypePicker() {
+    setTypeQuery('');
+    setTypePickerVisible(true);
+  }
+
+  function closeTypePicker() {
+    setTypePickerVisible(false);
+    setTypeQuery('');
+  }
+
+  function selectBuiltInType(value: ItemType) {
+    setType(value);
+    setCustomTypeLabel('');
+    closeTypePicker();
+  }
+
+  function selectCustomType(label: string) {
+    setType('other');
+    setCustomTypeLabel(label);
+    closeTypePicker();
+  }
+
+  function createCustomType() {
+    if (!canCreateType) {
+      return;
+    }
+    setType('other');
+    setCustomTypeLabel(trimmedTypeQuery);
+    closeTypePicker();
+  }
 
   function resetForm() {
+    setType('idea');
+    setCustomTypeLabel('');
     setTitle('');
     setContent('');
-    setUrl('');
+    setSourceUrlInput('');
     setCategory('');
     setTagsInput('');
   }
@@ -59,38 +124,21 @@ export default function AddItemScreen({ navigation }: Props) {
 
     const now = new Date().toISOString();
     const tags = parseTagsInput(tagsInput);
-    const trimmedCategory = category.trim();
-    const resolvedCategory = trimmedCategory || undefined;
+    const resolvedCategory = category.trim() || undefined;
 
-    let newItem: Item;
-
-    if (option === 'link') {
-      // isValid guarantees normalizedUrl is non-null here.
-      const sourceUrl = normalizedUrl!;
-      newItem = {
-        id: generateLocalId('item'),
-        title: title.trim() || sourceUrl,
-        type: 'other',
-        category: resolvedCategory,
-        createdAt: now,
-        updatedAt: now,
-        captureType: 'url',
-        sourceUrl,
-        tags,
-      };
-    } else {
-      newItem = {
-        id: generateLocalId('item'),
-        title: title.trim(),
-        type: option,
-        category: resolvedCategory,
-        createdAt: now,
-        updatedAt: now,
-        captureType: 'manual',
-        originalText: content.trim(),
-        tags,
-      };
-    }
+    const newItem: Item = {
+      id: generateLocalId('item'),
+      title: trimmedTitle || normalizedUrl || '',
+      type,
+      customTypeLabel: type === 'other' ? customTypeLabel.trim() : undefined,
+      category: resolvedCategory,
+      createdAt: now,
+      updatedAt: now,
+      captureType: normalizedUrl ? 'url' : 'manual',
+      sourceUrl: normalizedUrl ?? undefined,
+      originalText: trimmedContent || undefined,
+      tags,
+    };
 
     addItem(newItem);
     resetForm();
@@ -103,83 +151,39 @@ export default function AddItemScreen({ navigation }: Props) {
       contentContainerStyle={styles.scrollContent}
       keyboardShouldPersistTaps="handled"
     >
-      <View style={styles.segmentedControl}>
-        {CAPTURE_OPTIONS.map((item) => {
-          const selected = item.value === option;
-          return (
-            <Pressable
-              key={item.value}
-              style={[styles.segment, selected && styles.segmentSelected]}
-              onPress={() => setOption(item.value)}
-            >
-              <Text
-                style={[
-                  styles.segmentText,
-                  selected && styles.segmentTextSelected,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+      <View style={styles.field}>
+        <Text style={styles.label}>Type</Text>
+        <Pressable style={styles.selector} onPress={openTypePicker}>
+          <Text style={styles.selectorText}>
+            {getItemTypeLabel({ type, captureType: 'manual', customTypeLabel })}
+          </Text>
+          <Text style={styles.selectorChevron}>⌄</Text>
+        </Pressable>
       </View>
 
-      {option === 'link' ? (
-        <View style={styles.field}>
-          <Text style={styles.label}>URL</Text>
-          <TextInput
-            style={styles.input}
-            value={url}
-            onChangeText={setUrl}
-            placeholder="example.com"
-            placeholderTextColor="#9A9A9A"
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-          />
-        </View>
-      ) : null}
-
       <View style={styles.field}>
-        <Text style={styles.label}>
-          {option === 'link' ? 'Title (optional)' : 'Title'}
-        </Text>
+        <Text style={styles.label}>Title</Text>
         <TextInput
           style={styles.input}
           value={title}
           onChangeText={setTitle}
-          placeholder={
-            option === 'idea'
-              ? 'Give this idea a name'
-              : option === 'note'
-                ? 'Give this note a name'
-                : 'How should this link be labeled?'
-          }
+          placeholder="Give this a name"
           placeholderTextColor="#9A9A9A"
         />
       </View>
 
-      {option !== 'link' ? (
-        <View style={styles.field}>
-          <Text style={styles.label}>
-            {option === 'idea' ? 'Idea' : 'Note'}
-          </Text>
-          <TextInput
-            style={[styles.input, styles.multilineInput]}
-            value={content}
-            onChangeText={setContent}
-            placeholder={
-              option === 'idea'
-                ? "What's the idea?"
-                : "What's on your mind?"
-            }
-            placeholderTextColor="#9A9A9A"
-            multiline
-            textAlignVertical="top"
-          />
-        </View>
-      ) : null}
+      <View style={styles.field}>
+        <Text style={styles.label}>{contentField.label}</Text>
+        <TextInput
+          style={[styles.input, styles.multilineInput]}
+          value={content}
+          onChangeText={setContent}
+          placeholder={contentField.placeholder}
+          placeholderTextColor="#9A9A9A"
+          multiline
+          textAlignVertical="top"
+        />
+      </View>
 
       <View style={styles.field}>
         <Text style={styles.label}>Category (optional)</Text>
@@ -204,6 +208,20 @@ export default function AddItemScreen({ navigation }: Props) {
         />
       </View>
 
+      <View style={styles.field}>
+        <Text style={styles.label}>Source URL (optional)</Text>
+        <TextInput
+          style={styles.input}
+          value={sourceUrlInput}
+          onChangeText={setSourceUrlInput}
+          placeholder="example.com"
+          placeholderTextColor="#9A9A9A"
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+        />
+      </View>
+
       <Pressable
         style={[styles.saveButton, !isValid && styles.saveButtonDisabled]}
         onPress={handleSave}
@@ -212,13 +230,87 @@ export default function AddItemScreen({ navigation }: Props) {
         <Text style={styles.saveButtonText}>Save</Text>
       </Pressable>
 
-      {!isValid ? (
-        <Text style={styles.hint}>
-          {option === 'link'
-            ? 'Enter a web address, e.g. example.com'
-            : 'Title and content are required.'}
-        </Text>
+      {validationMessage ? (
+        <Text style={styles.hint}>{validationMessage}</Text>
       ) : null}
+
+      <Modal
+        visible={typePickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeTypePicker}
+      >
+        <Pressable style={styles.modalOverlay} onPress={closeTypePicker}>
+          <Pressable style={styles.modalSheet} onPress={() => {}}>
+            <Text style={styles.modalTitle}>What is this?</Text>
+
+            <TextInput
+              style={styles.searchInput}
+              value={typeQuery}
+              onChangeText={setTypeQuery}
+              placeholder="Search or create a type"
+              placeholderTextColor="#9A9A9A"
+              autoFocus
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+
+            <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
+              {typeSearch.builtIns.map((option) => {
+                const selected = type === option.value;
+                return (
+                  <Pressable
+                    key={option.value}
+                    style={styles.modalRow}
+                    onPress={() => selectBuiltInType(option.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.modalRowText,
+                        selected && styles.modalRowTextSelected,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                    {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                  </Pressable>
+                );
+              })}
+
+              {typeSearch.customLabels.map((label) => {
+                const selected =
+                  type === 'other' &&
+                  normalizeTypeKey(customTypeLabel) === normalizeTypeKey(label);
+                return (
+                  <Pressable
+                    key={`custom-${label}`}
+                    style={styles.modalRow}
+                    onPress={() => selectCustomType(label)}
+                  >
+                    <Text
+                      style={[
+                        styles.modalRowText,
+                        selected && styles.modalRowTextSelected,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                    {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                  </Pressable>
+                );
+              })}
+
+              {canCreateType ? (
+                <Pressable style={styles.modalRow} onPress={createCustomType}>
+                  <Text style={styles.modalCreateText}>
+                    + Create "{trimmedTypeQuery}"
+                  </Text>
+                </Pressable>
+              ) : null}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 }
@@ -231,30 +323,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 24,
     paddingBottom: 48,
-  },
-  segmentedControl: {
-    flexDirection: 'row',
-    backgroundColor: '#F0F0F0',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 24,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 9,
-    alignItems: 'center',
-  },
-  segmentSelected: {
-    backgroundColor: '#FFFFFF',
-  },
-  segmentText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B6B6B',
-  },
-  segmentTextSelected: {
-    color: '#1A1A1A',
   },
   field: {
     marginBottom: 18,
@@ -278,6 +346,26 @@ const styles = StyleSheet.create({
   multilineInput: {
     minHeight: 100,
   },
+  selector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  selectorText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1A1A',
+  },
+  selectorChevron: {
+    fontSize: 16,
+    color: '#9A9A9A',
+  },
   saveButton: {
     backgroundColor: '#1A1A1A',
     borderRadius: 12,
@@ -298,5 +386,66 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#9A9A9A',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#FAFAFA',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    maxHeight: '75%',
+  },
+  modalTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#9A9A9A',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 12,
+  },
+  searchInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#1A1A1A',
+    marginBottom: 8,
+  },
+  modalList: {
+    marginTop: 4,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5E5',
+  },
+  modalRowText: {
+    fontSize: 16,
+    color: '#1A1A1A',
+  },
+  modalRowTextSelected: {
+    fontWeight: '600',
+  },
+  modalRowCheck: {
+    fontSize: 15,
+    color: '#1A1A1A',
+    fontWeight: '600',
+  },
+  modalCreateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1A1A',
   },
 });
