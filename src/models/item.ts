@@ -32,7 +32,7 @@ export interface Item {
   id: string;
   title: string;
   type: ItemType;
-  category: ItemCategory;
+  category?: ItemCategory;
   createdAt: string;
   updatedAt: string;
 

@@ -9,12 +9,14 @@ import {
   View,
 } from 'react-native';
 import ItemCard from '../components/ItemCard';
-import { mockItems } from '../data/mockItems';
 import type { RootStackParamList } from '../navigation/types';
+import { useItems } from '../state/ItemsContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Library'>;
 
 export default function HomeScreen({ navigation }: Props) {
+  const { items } = useItems();
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -33,18 +35,21 @@ export default function HomeScreen({ navigation }: Props) {
           editable={false}
         />
 
-        <Pressable style={styles.button}>
+        <Pressable
+          style={styles.button}
+          onPress={() => navigation.navigate('AddItem')}
+        >
           <Text style={styles.buttonText}>+ Add</Text>
         </Pressable>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recently saved</Text>
-          {mockItems.length === 0 ? (
+          {items.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>Nothing saved yet.</Text>
             </View>
           ) : (
-            mockItems.map((item) => (
+            items.map((item) => (
               <ItemCard
                 key={item.id}
                 item={item}

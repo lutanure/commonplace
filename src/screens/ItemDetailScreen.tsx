@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   Alert,
   Image,
@@ -11,8 +11,9 @@ import {
   View,
 } from 'react-native';
 import Tag from '../components/Tag';
-import { mockItems } from '../data/mockItems';
 import type { RootStackParamList } from '../navigation/types';
+import { useItems } from '../state/ItemsContext';
+import { getItemTypeLabel } from '../utils/itemTypeLabel';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemDetail'>;
 
@@ -71,9 +72,14 @@ function MediaPreview({ uri }: { uri: string }) {
   );
 }
 
-export default function ItemDetailScreen({ route }: Props) {
+export default function ItemDetailScreen({ route, navigation }: Props) {
   const { itemId } = route.params;
-  const item = mockItems.find((candidate) => candidate.id === itemId);
+  const { getItemById } = useItems();
+  const item = getItemById(itemId);
+
+  useEffect(() => {
+    navigation.setOptions({ title: item?.title ?? 'Item' });
+  }, [navigation, item?.title]);
 
   if (!item) {
     return (
@@ -108,8 +114,10 @@ export default function ItemDetailScreen({ route }: Props) {
           <Text style={styles.title}>{item.title}</Text>
 
           <View style={styles.metaRow}>
-            <Text style={styles.typeBadge}>{item.type}</Text>
-            <Text style={styles.category}>{item.category}</Text>
+            <Text style={styles.typeBadge}>{getItemTypeLabel(item)}</Text>
+            {item.category ? (
+              <Text style={styles.category}>{item.category}</Text>
+            ) : null}
           </View>
 
           <Text style={styles.savedDate}>Saved {formatDate(item.createdAt)}</Text>

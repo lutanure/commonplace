@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Item } from '../models';
+import { getItemTypeLabel } from '../utils/itemTypeLabel';
 import Tag from './Tag';
 
 function relevantSnippet(item: Item): string | undefined {
@@ -31,10 +32,12 @@ export default function ItemCard({
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={styles.typeBadge}>{item.type}</Text>
+        <Text style={styles.typeBadge}>{getItemTypeLabel(item)}</Text>
       </View>
 
-      <Text style={styles.category}>{item.category}</Text>
+      {item.category ? (
+        <Text style={styles.category}>{item.category}</Text>
+      ) : null}
 
       {snippet ? (
         <Text style={styles.snippet} numberOfLines={2}>
