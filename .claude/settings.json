@@ -1,5 +1,12 @@
 {
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:8081/*)",
+      "Bash(xcrun simctl list devices*)",
+      "Bash(ipconfig getifaddr *)"
+    ]
   }
 }
