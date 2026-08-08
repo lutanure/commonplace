@@ -105,9 +105,18 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
-          deleteItem(itemId);
-          navigation.popToTop();
+        onPress: async () => {
+          try {
+            await deleteItem(itemId);
+            navigation.popToTop();
+          } catch (error) {
+            Alert.alert(
+              "Couldn't delete this item",
+              error instanceof Error
+                ? error.message
+                : 'Something went wrong. Please try again.'
+            );
+          }
         },
       },
     ]);

@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import Button from '../components/Button';
 import ItemForm, { type ItemFormResult } from '../components/ItemForm';
 import type { CaptureType, Item } from '../models';
@@ -47,18 +47,27 @@ export default function EditItemScreen({ route, navigation }: Props) {
   // narrowing/undefined check for something we already know is defined.
   const editableItem: Item = item;
 
-  function handleSubmit(result: ItemFormResult) {
-    updateItem(editableItem.id, {
-      title: result.title,
-      type: result.type,
-      customTypeLabel: result.customTypeLabel,
-      category: result.category,
-      captureType: resolveCaptureType(editableItem, result.sourceUrl),
-      sourceUrl: result.sourceUrl,
-      originalText: result.originalText,
-      tags: result.tags,
-    });
-    navigation.goBack();
+  async function handleSubmit(result: ItemFormResult) {
+    try {
+      await updateItem(editableItem.id, {
+        title: result.title,
+        type: result.type,
+        customTypeLabel: result.customTypeLabel,
+        category: result.category,
+        captureType: resolveCaptureType(editableItem, result.sourceUrl),
+        sourceUrl: result.sourceUrl,
+        originalText: result.originalText,
+        tags: result.tags,
+      });
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert(
+        "Couldn't save changes",
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong. Please try again.'
+      );
+    }
   }
 
   return <ItemForm initialItem={editableItem} onSubmit={handleSubmit} />;

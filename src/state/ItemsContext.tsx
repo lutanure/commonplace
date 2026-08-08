@@ -2,52 +2,70 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
-import { mockItems } from '../data/mockItems';
+import * as itemsRepository from '../data/itemsRepository';
+import type { NewItemInput } from '../data/mappers';
 import type { Item } from '../models';
 
 interface ItemsContextValue {
   items: Item[];
-  addItem: (item: Item) => void;
-  updateItem: (id: string, updates: Partial<Item>) => void;
-  deleteItem: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+  addItem: (input: NewItemInput) => Promise<Item>;
+  updateItem: (id: string, updates: Partial<Item>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
   getItemById: (id: string) => Item | undefined;
 }
 
 const ItemsContext = createContext<ItemsContextValue | undefined>(undefined);
 
 export function ItemsProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<Item[]>(mockItems);
+  const [items, setItems] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addItem = useCallback((item: Item) => {
-    setItems((current) => [item, ...current]);
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const fetched = await itemsRepository.listItems();
+      setItems(fetched);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to load your library.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // Merges `updates` onto the existing item — any field not present in
-  // `updates` is left untouched, so callers only need to pass what's
-  // actually changing. `id`/`createdAt` are always preserved regardless
-  // of what's passed in, and `updatedAt` is always stamped fresh here so
-  // callers can't forget it.
-  const updateItem = useCallback((id: string, updates: Partial<Item>) => {
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const addItem = useCallback(async (input: NewItemInput) => {
+    const created = await itemsRepository.createItem(input);
+    setItems((current) => [created, ...current]);
+    return created;
+  }, []);
+
+  // Reflects whatever the repository actually returns (DB-owned
+  // updated_at, resolved tags, ...) rather than re-stamping locally, so
+  // client and server state can't silently disagree.
+  const updateItem = useCallback(async (id: string, updates: Partial<Item>) => {
+    const updated = await itemsRepository.updateItem(id, updates);
     setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              ...updates,
-              id: item.id,
-              createdAt: item.createdAt,
-              updatedAt: new Date().toISOString(),
-            }
-          : item
-      )
+      current.map((item) => (item.id === id ? updated : item))
     );
   }, []);
 
-  const deleteItem = useCallback((id: string) => {
+  const deleteItem = useCallback(async (id: string) => {
+    await itemsRepository.deleteItem(id);
     setItems((current) => current.filter((item) => item.id !== id));
   }, []);
 
@@ -57,8 +75,26 @@ export function ItemsProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ items, addItem, updateItem, deleteItem, getItemById }),
-    [items, addItem, updateItem, deleteItem, getItemById]
+    () => ({
+      items,
+      isLoading,
+      error,
+      refresh,
+      addItem,
+      updateItem,
+      deleteItem,
+      getItemById,
+    }),
+    [
+      items,
+      isLoading,
+      error,
+      refresh,
+      addItem,
+      updateItem,
+      deleteItem,
+      getItemById,
+    ]
   );
 
   return (

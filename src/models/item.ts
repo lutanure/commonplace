@@ -3,6 +3,9 @@ import type { Tag } from './tag';
 // What the saved information *is*, independent of how it entered the app.
 // 'other' is the deliberate escape hatch for anything not covered by the
 // built-in list — paired with `customTypeLabel` below.
+// Kept in sync by hand with the `items_type_check` constraint in
+// supabase/migrations/0001_init.sql — this union is the source of truth,
+// the DB constraint is a backstop.
 export type ItemType =
   | 'idea'
   | 'note'
@@ -23,7 +26,9 @@ export type ItemType =
 // or user-defined and shouldn't be constrained to a fixed set.
 export type ItemCategory = string;
 
-// How the item entered Commonplace, independent of what it's about.
+// How the item entered Commonplace, independent of what it's about. Kept in
+// sync by hand with `items_capture_type_check` in
+// supabase/migrations/0001_init.sql.
 export type CaptureType = 'screenshot' | 'url' | 'manual' | 'image' | 'text';
 
 // A single extracted fact, e.g. { label: 'Price', value: '$39.95' }.

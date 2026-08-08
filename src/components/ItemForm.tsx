@@ -112,6 +112,8 @@ export default function ItemForm({
   const trimmedTypeQuery = typeQuery.trim();
   const canCreateType = trimmedTypeQuery.length > 0 && !typeSearch.exactMatch;
 
+  const trimmedCustomTypeLabel = customTypeLabel.trim();
+
   const validationMessage = useMemo(() => {
     if (!urlIsValid) {
       return 'Enter a valid web address, e.g. example.com';
@@ -122,8 +124,18 @@ export default function ItemForm({
     ) {
       return 'Title and content are required.';
     }
+    if (type === 'other' && trimmedCustomTypeLabel.length === 0) {
+      return 'Choose or create a type.';
+    }
     return null;
-  }, [urlIsValid, hasUrlInput, trimmedTitle, trimmedContent]);
+  }, [
+    urlIsValid,
+    hasUrlInput,
+    trimmedTitle,
+    trimmedContent,
+    type,
+    trimmedCustomTypeLabel,
+  ]);
 
   const isValid = validationMessage === null;
 

@@ -1,5 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
+  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,7 +17,7 @@ import { colors, radii, spacing, typography } from '../theme';
 type Props = NativeStackScreenProps<RootStackParamList, 'Library'>;
 
 export default function HomeScreen({ navigation }: Props) {
-  const { items } = useItems();
+  const { items, isLoading, error, refresh } = useItems();
   const year = new Date().getFullYear();
 
   return (
@@ -50,10 +51,29 @@ export default function HomeScreen({ navigation }: Props) {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            Recently saved — {items.length}{' '}
-            {items.length === 1 ? 'item' : 'items'}
+            {isLoading || error
+              ? 'Recently saved'
+              : `Recently saved — ${items.length} ${
+                  items.length === 1 ? 'item' : 'items'
+                }`}
           </Text>
-          {items.length === 0 ? (
+          {isLoading ? (
+            <View style={styles.emptyState}>
+              <ActivityIndicator color={colors.ink} />
+            </View>
+          ) : error ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>
+                Could not load your library.
+              </Text>
+              <Button
+                label="Retry"
+                variant="neutral"
+                onPress={() => refresh()}
+                style={styles.retryButton}
+              />
+            </View>
+          ) : items.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>Nothing saved yet.</Text>
             </View>
@@ -153,6 +173,10 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 15,
     color: colors.inkFaint,
+  },
+  retryButton: {
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.xl,
   },
   endDivider: {
     flexDirection: 'row',

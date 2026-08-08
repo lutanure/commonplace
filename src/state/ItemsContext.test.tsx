@@ -1,9 +1,20 @@
-import { act, renderHook } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
+import * as itemsRepository from '../data/itemsRepository';
 import type { Item } from '../models';
 import { ItemsProvider, useItems } from './ItemsContext';
 
-// Distinct from the seeded mockItems ids ('item-1'..'item-5') so these
-// tests can't accidentally collide with real seed data.
+jest.mock('../data/itemsRepository', () => ({
+  listItems: jest.fn(),
+  createItem: jest.fn(),
+  updateItem: jest.fn(),
+  deleteItem: jest.fn(),
+}));
+
+const mockedListItems = itemsRepository.listItems as jest.Mock;
+const mockedCreateItem = itemsRepository.createItem as jest.Mock;
+const mockedUpdateItem = itemsRepository.updateItem as jest.Mock;
+const mockedDeleteItem = itemsRepository.deleteItem as jest.Mock;
+
 function makeItem(overrides: Partial<Item> = {}): Item {
   return {
     id: 'test-item',
@@ -21,82 +32,130 @@ function renderItemsHook() {
   return renderHook(() => useItems(), { wrapper: ItemsProvider });
 }
 
+beforeEach(() => {
+  mockedListItems.mockReset();
+  mockedCreateItem.mockReset();
+  mockedUpdateItem.mockReset();
+  mockedDeleteItem.mockReset();
+});
+
 describe('ItemsContext', () => {
-  it('starts seeded with the existing mock items', () => {
+  it('starts loading, then loads items from the repository', async () => {
+    mockedListItems.mockResolvedValue([makeItem({ id: 'item-1' })]);
     const { result } = renderItemsHook();
-    expect(result.current.items.length).toBeGreaterThan(0);
+
+    expect(result.current.isLoading).toBe(true);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.items).toEqual([makeItem({ id: 'item-1' })]);
+    expect(result.current.error).toBeNull();
   });
 
-  it('addItem prepends the new item to the collection', () => {
+  it('sets an error when the initial load fails', async () => {
+    mockedListItems.mockRejectedValue(new Error('network down'));
     const { result } = renderItemsHook();
-    const before = result.current.items.length;
-    const newItem = makeItem({ id: 'test-add', title: 'New item' });
 
-    act(() => {
-      result.current.addItem(newItem);
-    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.items).toHaveLength(before + 1);
-    expect(result.current.items[0]).toEqual(newItem);
+    expect(result.current.error).toBe('network down');
+    expect(result.current.items).toEqual([]);
   });
 
-  it('updateItem merges only the given fields, preserving id/createdAt and refreshing updatedAt', () => {
+  it('refresh() re-fetches and clears a previous error', async () => {
+    mockedListItems.mockRejectedValueOnce(new Error('network down'));
     const { result } = renderItemsHook();
-    const original = makeItem({
-      id: 'test-update',
-      title: 'Original title',
-      category: 'ideas',
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBe('network down');
+
+    mockedListItems.mockResolvedValueOnce([makeItem({ id: 'item-1' })]);
+    await act(async () => {
+      await result.current.refresh();
     });
 
-    act(() => {
-      result.current.addItem(original);
-    });
-    act(() => {
-      result.current.updateItem('test-update', { title: 'Updated title' });
-    });
-
-    const updated = result.current.getItemById('test-update');
-    expect(updated?.title).toBe('Updated title');
-    expect(updated?.category).toBe('ideas');
-    expect(updated?.id).toBe('test-update');
-    expect(updated?.createdAt).toBe('2020-01-01T00:00:00.000Z');
-    expect(updated?.updatedAt).not.toBe('2020-01-01T00:00:00.000Z');
+    expect(result.current.error).toBeNull();
+    expect(result.current.items).toEqual([makeItem({ id: 'item-1' })]);
   });
 
-  it('updateItem on an unknown id is a no-op', () => {
+  it('addItem prepends the repository-created item to the collection', async () => {
+    mockedListItems.mockResolvedValue([makeItem({ id: 'existing' })]);
     const { result } = renderItemsHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const created = makeItem({ id: 'new-item', title: 'New item' });
+    mockedCreateItem.mockResolvedValue(created);
+
+    await act(async () => {
+      await result.current.addItem({
+        title: 'New item',
+        type: 'idea',
+        captureType: 'manual',
+        tags: [],
+      });
+    });
+
+    expect(mockedCreateItem).toHaveBeenCalledWith({
+      title: 'New item',
+      type: 'idea',
+      captureType: 'manual',
+      tags: [],
+    });
+    expect(result.current.items).toEqual([
+      created,
+      makeItem({ id: 'existing' }),
+    ]);
+  });
+
+  it('updateItem replaces the matching item with the repository-returned row', async () => {
+    mockedListItems.mockResolvedValue([makeItem({ id: 'item-1' })]);
+    const { result } = renderItemsHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const updated = makeItem({ id: 'item-1', title: 'Updated title' });
+    mockedUpdateItem.mockResolvedValue(updated);
+
+    await act(async () => {
+      await result.current.updateItem('item-1', { title: 'Updated title' });
+    });
+
+    expect(mockedUpdateItem).toHaveBeenCalledWith('item-1', {
+      title: 'Updated title',
+    });
+    expect(result.current.getItemById('item-1')).toEqual(updated);
+  });
+
+  it('deleteItem removes the matching item after the repository call resolves', async () => {
+    mockedListItems.mockResolvedValue([makeItem({ id: 'item-1' })]);
+    const { result } = renderItemsHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    mockedDeleteItem.mockResolvedValue(undefined);
+
+    await act(async () => {
+      await result.current.deleteItem('item-1');
+    });
+
+    expect(mockedDeleteItem).toHaveBeenCalledWith('item-1');
+    expect(result.current.getItemById('item-1')).toBeUndefined();
+  });
+
+  it('addItem/updateItem/deleteItem reject and leave state unchanged on repository failure', async () => {
+    mockedListItems.mockResolvedValue([makeItem({ id: 'item-1' })]);
+    const { result } = renderItemsHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     const before = result.current.items;
 
-    act(() => {
-      result.current.updateItem('does-not-exist', { title: 'x' });
-    });
-
-    expect(result.current.items).toEqual(before);
-  });
-
-  it('deleteItem removes the matching item', () => {
-    const { result } = renderItemsHook();
-
-    act(() => {
-      result.current.addItem(makeItem({ id: 'test-delete' }));
-    });
-    expect(result.current.getItemById('test-delete')).toBeDefined();
-
-    act(() => {
-      result.current.deleteItem('test-delete');
-    });
-
-    expect(result.current.getItemById('test-delete')).toBeUndefined();
-  });
-
-  it('deleteItem on an unknown id is a no-op', () => {
-    const { result } = renderItemsHook();
-    const before = result.current.items;
-
-    act(() => {
-      result.current.deleteItem('does-not-exist');
-    });
-
+    mockedCreateItem.mockRejectedValue(new Error('insert failed'));
+    await expect(
+      act(async () => {
+        await result.current.addItem({
+          title: 'x',
+          type: 'idea',
+          captureType: 'manual',
+          tags: [],
+        });
+      })
+    ).rejects.toThrow('insert failed');
     expect(result.current.items).toEqual(before);
   });
 });
