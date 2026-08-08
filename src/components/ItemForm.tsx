@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -14,10 +15,14 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { Item, ItemType, Tag } from '../models';
 import { useItems } from '../state/ItemsContext';
+import { colors, radii, spacing, typography } from '../theme';
+import { getItemTypeColor } from '../theme/itemTypeColors';
 import { getItemTypeLabel } from '../utils/itemTypeLabel';
 import { parseTagsInput } from '../utils/tags';
 import { normalizeTypeKey, searchItemTypes } from '../utils/typeTaxonomy';
 import { normalizeUrl } from '../utils/url';
+import Button from './Button';
+import TypePill from './TypePill';
 
 // Sensible per-type wording for the shared content field — not a unique
 // form per type, just a friendlier label/placeholder where it's easy.
@@ -29,8 +34,8 @@ const CONTENT_FIELD: Partial<
   quote: { label: 'Quote', placeholder: 'The quote itself' },
 };
 const DEFAULT_CONTENT_FIELD = {
-  label: 'Notes',
-  placeholder: 'Any details worth remembering',
+  label: 'Notes & content',
+  placeholder: 'What do you want to remember about this?',
 };
 
 // What ItemForm hands back on submit. It only covers the fields a user is
@@ -46,6 +51,21 @@ export interface ItemFormResult {
   category?: string;
   tags: Tag[];
   sourceUrl?: string;
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      {children}
+    </View>
+  );
 }
 
 export default function ItemForm({
@@ -166,88 +186,86 @@ export default function ItemForm({
         keyboardDismissMode="none"
         bottomOffset={24}
       >
-        <View style={styles.field}>
-          <Text style={styles.label}>Type</Text>
+        <FormField label="What are you saving?">
           <Pressable style={styles.selector} onPress={openTypePicker}>
-            <Text style={styles.selectorText}>
-              {getItemTypeLabel({
-                type,
-                captureType: 'manual',
-                customTypeLabel,
-              })}
-            </Text>
+            <View style={styles.selectorPreview}>
+              <TypePill
+                item={{ type, captureType: 'manual', customTypeLabel }}
+              />
+              <Text style={styles.selectorText}>
+                {getItemTypeLabel({
+                  type,
+                  captureType: 'manual',
+                  customTypeLabel,
+                })}
+              </Text>
+            </View>
             <Text style={styles.selectorChevron}>⌄</Text>
           </Pressable>
-        </View>
+        </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Title</Text>
+        <FormField label="Title *">
           <TextInput
             style={styles.input}
             value={title}
             onChangeText={setTitle}
-            placeholder="Give this a name"
-            placeholderTextColor="#9A9A9A"
+            placeholder="Name of the thing"
+            placeholderTextColor={colors.inkFaint}
           />
-        </View>
+        </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>{contentField.label}</Text>
+        <FormField label={contentField.label}>
           <TextInput
             style={[styles.input, styles.multilineInput]}
             value={content}
             onChangeText={setContent}
             placeholder={contentField.placeholder}
-            placeholderTextColor="#9A9A9A"
+            placeholderTextColor={colors.inkFaint}
             multiline
             textAlignVertical="top"
           />
-        </View>
+        </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Category (optional)</Text>
+        <FormField label="Category — optional">
           <TextInput
             style={styles.input}
             value={category}
             onChangeText={setCategory}
             placeholder="e.g. product idea, travel, work"
-            placeholderTextColor="#9A9A9A"
+            placeholderTextColor={colors.inkFaint}
           />
-        </View>
+        </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Tags (optional)</Text>
+        <FormField label="Tags — optional">
           <TextInput
-            style={styles.input}
+            style={[styles.input, styles.inputDashed]}
             value={tagsInput}
             onChangeText={setTagsInput}
-            placeholder="comma, separated, tags"
-            placeholderTextColor="#9A9A9A"
+            placeholder="e.g. love, film, 2024"
+            placeholderTextColor={colors.inkFaint}
             autoCapitalize="none"
           />
-        </View>
+        </FormField>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Source URL (optional)</Text>
+        <FormField label="Source URL — optional">
           <TextInput
-            style={styles.input}
+            style={[styles.input, styles.inputDashed]}
             value={sourceUrlInput}
             onChangeText={setSourceUrlInput}
-            placeholder="example.com"
-            placeholderTextColor="#9A9A9A"
+            placeholder="https://…"
+            placeholderTextColor={colors.inkFaint}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
           />
-        </View>
+        </FormField>
 
-        <Pressable
-          style={[styles.saveButton, !isValid && styles.saveButtonDisabled]}
+        <Button
+          label="Save to Library"
           onPress={handleSave}
           disabled={!isValid}
-        >
-          <Text style={styles.saveButtonText}>Save</Text>
-        </Pressable>
+          style={styles.saveButton}
+        />
 
         {validationMessage ? (
           <Text style={styles.hint}>{validationMessage}</Text>
@@ -273,7 +291,7 @@ export default function ItemForm({
                 value={typeQuery}
                 onChangeText={setTypeQuery}
                 placeholder="Search or create a type"
-                placeholderTextColor="#9A9A9A"
+                placeholderTextColor={colors.inkFaint}
                 autoFocus
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -287,20 +305,29 @@ export default function ItemForm({
               >
                 {typeSearch.builtIns.map((option) => {
                   const selected = type === option.value;
+                  const { background } = getItemTypeColor(option.value);
                   return (
                     <Pressable
                       key={option.value}
                       style={styles.modalRow}
                       onPress={() => selectBuiltInType(option.value)}
                     >
-                      <Text
-                        style={[
-                          styles.modalRowText,
-                          selected && styles.modalRowTextSelected,
-                        ]}
-                      >
-                        {option.label}
-                      </Text>
+                      <View style={styles.modalRowLeft}>
+                        <View
+                          style={[
+                            styles.modalRowDot,
+                            { backgroundColor: background },
+                          ]}
+                        />
+                        <Text
+                          style={[
+                            styles.modalRowText,
+                            selected && styles.modalRowTextSelected,
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </View>
                       {selected ? (
                         <Text style={styles.modalRowCheck}>✓</Text>
                       ) : null}
@@ -313,20 +340,29 @@ export default function ItemForm({
                     type === 'other' &&
                     normalizeTypeKey(customTypeLabel) ===
                       normalizeTypeKey(label);
+                  const { background } = getItemTypeColor('other');
                   return (
                     <Pressable
                       key={`custom-${label}`}
                       style={styles.modalRow}
                       onPress={() => selectCustomType(label)}
                     >
-                      <Text
-                        style={[
-                          styles.modalRowText,
-                          selected && styles.modalRowTextSelected,
-                        ]}
-                      >
-                        {label}
-                      </Text>
+                      <View style={styles.modalRowLeft}>
+                        <View
+                          style={[
+                            styles.modalRowDot,
+                            { backgroundColor: background },
+                          ]}
+                        />
+                        <Text
+                          style={[
+                            styles.modalRowText,
+                            selected && styles.modalRowTextSelected,
+                          ]}
+                        >
+                          {label}
+                        </Text>
+                      </View>
                       {selected ? (
                         <Text style={styles.modalRowCheck}>✓</Text>
                       ) : null}
@@ -353,78 +389,72 @@ export default function ItemForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: colors.paper,
   },
   scrollContent: {
-    padding: 24,
-    paddingBottom: 48,
+    padding: spacing.xl,
+    paddingBottom: spacing.xxl,
   },
   field: {
-    marginBottom: 18,
+    marginBottom: spacing.lg + 2,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#6B6B6B',
-    marginBottom: 6,
+    ...typography.label,
+    marginBottom: spacing.sm,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: colors.paperElevated,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderColor: colors.hairlineStrong,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     fontSize: 15,
-    color: '#1A1A1A',
+    color: colors.ink,
+  },
+  inputDashed: {
+    borderStyle: 'dashed',
+    borderColor: colors.inkFaint,
   },
   multilineInput: {
-    minHeight: 100,
+    minHeight: 110,
   },
   selector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: colors.paperElevated,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderColor: colors.hairlineStrong,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  selectorPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   selectorText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    ...typography.displayMD,
+    fontSize: 17,
   },
   selectorChevron: {
-    fontSize: 16,
-    color: '#9A9A9A',
+    fontSize: 18,
+    color: colors.inkMuted,
   },
   saveButton: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  saveButtonDisabled: {
-    opacity: 0.35,
-  },
-  saveButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: spacing.sm,
   },
   hint: {
-    marginTop: 10,
+    marginTop: spacing.md - 2,
     fontSize: 13,
-    color: '#9A9A9A',
+    color: colors.inkFaint,
     textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(34, 36, 46, 0.4)',
     justifyContent: 'flex-end',
   },
   // maxHeight lives here rather than on modalSheet: this is the direct
@@ -436,58 +466,64 @@ const styles = StyleSheet.create({
     maxHeight: '75%',
   },
   modalSheet: {
-    backgroundColor: '#FAFAFA',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 16,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
+    backgroundColor: colors.paper,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxl,
   },
   modalTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#9A9A9A',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 12,
+    ...typography.label,
+    marginBottom: spacing.md,
   },
   searchInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: colors.paperElevated,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderColor: colors.hairlineStrong,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     fontSize: 15,
-    color: '#1A1A1A',
-    marginBottom: 8,
+    color: colors.ink,
+    marginBottom: spacing.sm,
   },
   modalList: {
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   modalRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: spacing.md + 2,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5E5',
+    borderBottomColor: colors.hairline,
+  },
+  modalRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  modalRowDot: {
+    width: 10,
+    height: 10,
+    borderRadius: radii.pill,
   },
   modalRowText: {
     fontSize: 16,
-    color: '#1A1A1A',
+    color: colors.ink,
   },
   modalRowTextSelected: {
-    fontWeight: '600',
+    fontWeight: '700',
   },
   modalRowCheck: {
     fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '600',
+    color: colors.tomato,
+    fontWeight: '700',
   },
   modalCreateText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: '700',
+    color: colors.tomato,
   },
 });

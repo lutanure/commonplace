@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Item } from '../models';
-import { getItemTypeLabel } from '../utils/itemTypeLabel';
-import Tag from './Tag';
+import { colors, radii, spacing, typography } from '../theme';
+import TypePill from './TypePill';
 
 function relevantSnippet(item: Item): string | undefined {
   if (item.summary) {
@@ -14,6 +14,17 @@ function relevantSnippet(item: Item): string | undefined {
   return item.originalText;
 }
 
+function formatCardDate(iso: string): string {
+  return new Date(iso)
+    .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    .toUpperCase();
+}
+
+// Deliberately restrained: the type pill is the only color-coded element,
+// title and snippet carry the visual weight, and date/metadata stay quiet
+// — an archive fragment, not a data box. Category and tags are shown in
+// full on Item Detail; repeating them here would compete with the title
+// for attention on a list that's meant to be scanned quickly.
 export default function ItemCard({
   item,
   onPress,
@@ -29,28 +40,18 @@ export default function ItemCard({
       onPress={onPress}
     >
       <View style={styles.headerRow}>
-        <Text style={styles.title} numberOfLines={2}>
-          {item.title}
-        </Text>
-        <Text style={styles.typeBadge}>{getItemTypeLabel(item)}</Text>
+        <TypePill item={item} />
+        <Text style={styles.date}>{formatCardDate(item.createdAt)}</Text>
       </View>
 
-      {item.category ? (
-        <Text style={styles.category}>{item.category}</Text>
-      ) : null}
+      <Text style={styles.title} numberOfLines={2}>
+        {item.title}
+      </Text>
 
       {snippet ? (
         <Text style={styles.snippet} numberOfLines={2}>
           {snippet}
         </Text>
-      ) : null}
-
-      {item.tags.length > 0 ? (
-        <View style={styles.tagRow}>
-          {item.tags.map((tag) => (
-            <Tag key={tag.id} label={tag.name} />
-          ))}
-        </View>
       ) : null}
     </Pressable>
   );
@@ -58,50 +59,31 @@ export default function ItemCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: colors.paper,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    padding: 16,
-    marginBottom: 12,
+    borderColor: colors.hairline,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
   },
   cardPressed: {
-    opacity: 0.6,
+    backgroundColor: colors.paperElevated,
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
+  date: {
+    ...typography.caption,
+    letterSpacing: 0.4,
+  },
   title: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginRight: 8,
-  },
-  typeBadge: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#9A9A9A',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  category: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#6B6B6B',
+    ...typography.cardTitle,
+    marginTop: spacing.sm + 2,
   },
   snippet: {
-    marginTop: 8,
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#4A4A4A',
-  },
-  tagRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
+    ...typography.bodyMuted,
+    marginTop: spacing.xs + 2,
   },
 });

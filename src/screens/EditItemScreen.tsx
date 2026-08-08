@@ -1,9 +1,11 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import Button from '../components/Button';
 import ItemForm, { type ItemFormResult } from '../components/ItemForm';
 import type { CaptureType, Item } from '../models';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
+import { colors, spacing } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditItem'>;
 
@@ -35,12 +37,7 @@ export default function EditItemScreen({ route, navigation }: Props) {
     return (
       <View style={styles.container}>
         <Text style={styles.notFound}>This item could not be found.</Text>
-        <Pressable
-          style={styles.goBackButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.goBackButtonText}>Go back</Text>
-        </Pressable>
+        <Button label="Go back" onPress={() => navigation.goBack()} />
       </View>
     );
   }
@@ -70,26 +67,15 @@ export default function EditItemScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: colors.paper,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.xl,
   },
   notFound: {
     fontSize: 15,
-    color: '#9A9A9A',
+    color: colors.inkFaint,
     textAlign: 'center',
-    marginBottom: 16,
-  },
-  goBackButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#1A1A1A',
-  },
-  goBackButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
+    marginBottom: spacing.lg,
   },
 });

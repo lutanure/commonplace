@@ -25,12 +25,44 @@ npm start             # start Metro / Expo dev server (same as `npx expo start`)
 npm run ios           # start dev server and open iOS simulator
 npm run android        # start dev server and open Android emulator
 npm run web             # start dev server for web (requires react-dom + react-native-web, not yet installed)
-npx tsc --noEmit         # type-check the project (no separate lint/test scripts exist yet)
-npx expo-doctor            # validate Expo project health/config
+npm run typecheck        # type-check the project (tsc --noEmit)
+npm run lint              # ESLint (expo lint / eslint-config-expo, flat config in eslint.config.js)
+npm run format              # Prettier --write .
+npm run format:check         # Prettier --check . (used in CI/verify; does not modify files)
+npm run test                  # Jest unit tests (jest-expo preset)
+npm run verify                  # typecheck && lint && format:check && test, in that order
+npx expo-doctor                   # validate Expo project health/config
 ```
 
-There are no test or lint scripts configured yet. Add them (and wire this section) if you introduce
-a test runner or linter.
+CI (`.github/workflows/ci.yml`) runs `npm run verify` on every push/PR to `main`.
+
+## Verification before declaring a task complete
+
+- Before declaring any implementation task complete, run `npm run verify` and report the result.
+- If the change touches Expo config, dependencies, native modules, or other platform-sensitive
+  behavior, also run `npx expo-doctor`.
+- If the change affects user-facing mobile behavior, `npm run verify` passing is not sufficient —
+  explicitly tell the user what to check in Expo Go on a physical iPhone, the project's main
+  development target.
+- Never weaken, remove, skip, or rewrite an existing test merely to make a change pass without
+  first explaining the underlying reason.
+- Never commit or push — the user handles all Git commits and pushes.
+
+## Git workflow
+
+- For every meaningful new feature, fix, refactor, or infrastructure task, work on a short-lived
+  branch rather than directly on `main`.
+- Before starting work, inspect the current branch and `git status`.
+  - If the working tree is clean and on `main`, create an appropriately named branch:
+    `feat/...`, `fix/...`, `refactor/...`, or `chore/...`.
+  - If already on a branch for the current task, keep using it — don't create a new branch for
+    every small follow-up or UI tweak within the same task.
+- Never switch branches when doing so could endanger uncommitted work.
+- Never commit, push, merge, rebase, reset, force-push, delete branches, or open/merge pull
+  requests unless explicitly asked — the user handles all of that themselves.
+- When a task is finished, leave all changes uncommitted and report: (1) the current branch,
+  (2) files changed, (3) verification/tests run and their results, and (4) a suggested
+  Conventional Commit message (e.g. `feat: ...`, `fix: ...`, `chore: ...`).
 
 ## Architecture
 

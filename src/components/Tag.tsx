@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { colors, radii, spacing } from '../theme';
 
 export default function Tag({
   label,
@@ -16,18 +17,21 @@ export default function Tag({
 
 const styles = StyleSheet.create({
   chip: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 999,
-    paddingHorizontal: 10,
+    backgroundColor: colors.paperElevated,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    paddingHorizontal: spacing.sm + 2,
     paddingVertical: 4,
   },
   chipOutline: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: colors.hairlineStrong,
   },
   text: {
     fontSize: 12,
-    color: '#4A4A4A',
+    color: colors.inkMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
 });

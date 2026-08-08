@@ -10,10 +10,12 @@ import {
   Text,
   View,
 } from 'react-native';
+import Button from '../components/Button';
 import Tag from '../components/Tag';
+import TypePill from '../components/TypePill';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
-import { getItemTypeLabel } from '../utils/itemTypeLabel';
+import { colors, radii, spacing, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemDetail'>;
 
@@ -131,14 +133,13 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
         <View style={styles.section}>
           {item.mediaUri ? <MediaPreview uri={item.mediaUri} /> : null}
 
+          <TypePill item={item} />
+
           <Text style={styles.title}>{item.title}</Text>
 
-          <View style={styles.metaRow}>
-            <Text style={styles.typeBadge}>{getItemTypeLabel(item)}</Text>
-            {item.category ? (
-              <Text style={styles.category}>{item.category}</Text>
-            ) : null}
-          </View>
+          {item.category ? (
+            <Text style={styles.category}>{item.category}</Text>
+          ) : null}
 
           <Text style={styles.savedDate}>
             Saved {formatDate(item.createdAt)}
@@ -226,33 +227,26 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
               <Text style={styles.personalLine}>{item.whySaved}</Text>
             ) : null}
             {item.userNote ? (
-              <Text style={styles.personalLine}>{item.userNote}</Text>
+              <View style={styles.originalTextBlock}>
+                <Text style={styles.originalText}>{item.userNote}</Text>
+              </View>
             ) : null}
           </Section>
         ) : null}
 
         <View style={styles.actionRow}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.actionButton,
-              styles.editButton,
-              pressed && styles.editButtonPressed,
-            ]}
+          <Button
+            label="Edit"
+            variant="neutral"
+            style={styles.actionButton}
             onPress={() => navigation.navigate('EditItem', { itemId: item.id })}
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.actionButton,
-              styles.deleteButton,
-              pressed && styles.deleteButtonPressed,
-            ]}
+          />
+          <Button
+            label="Delete"
+            variant="destructive"
+            style={styles.actionButton}
             onPress={handleDeletePress}
-          >
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </View>
@@ -262,193 +256,146 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: colors.paper,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 48,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   notFound: {
     fontSize: 15,
-    color: '#9A9A9A',
-    marginTop: 40,
+    color: colors.inkFaint,
+    marginTop: spacing.xxl,
     textAlign: 'center',
   },
   section: {
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#9A9A9A',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 10,
+    ...typography.label,
+    marginBottom: spacing.md - 2,
   },
   media: {
     width: '100%',
     aspectRatio: 4 / 3,
-    borderRadius: 12,
-    backgroundColor: '#EFEFEF',
-    marginBottom: 16,
+    borderRadius: radii.sm,
+    backgroundColor: colors.paperMuted,
+    marginBottom: spacing.lg,
   },
   mediaPlaceholder: {
     width: '100%',
     aspectRatio: 4 / 3,
-    borderRadius: 12,
-    backgroundColor: '#EFEFEF',
-    marginBottom: 16,
+    borderRadius: radii.sm,
+    backgroundColor: colors.paperMuted,
+    marginBottom: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   mediaPlaceholderText: {
     fontSize: 14,
-    color: '#9A9A9A',
+    color: colors.inkFaint,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    lineHeight: 30,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    gap: 8,
-  },
-  typeBadge: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#9A9A9A',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    ...typography.displayLG,
+    marginTop: spacing.md,
   },
   category: {
+    marginTop: spacing.xs + 2,
     fontSize: 13,
-    color: '#6B6B6B',
+    color: colors.inkMuted,
   },
   savedDate: {
-    marginTop: 8,
-    fontSize: 13,
-    color: '#9A9A9A',
+    marginTop: spacing.sm,
+    ...typography.caption,
   },
   summary: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#4A4A4A',
+    color: colors.ink,
   },
   factsList: {
-    marginTop: 14,
+    marginTop: spacing.md + 2,
   },
   factRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E5E5',
+    borderTopColor: colors.hairline,
   },
   factLabel: {
     fontSize: 14,
-    color: '#6B6B6B',
+    color: colors.inkMuted,
   },
   factValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#1A1A1A',
-    marginLeft: 12,
+    color: colors.ink,
+    marginLeft: spacing.md,
     flexShrink: 1,
     textAlign: 'right',
   },
   chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: spacing.sm - 2,
   },
   chipRowSpaced: {
-    marginTop: 12,
+    marginTop: spacing.md,
   },
   sourceLine: {
     fontSize: 14,
-    color: '#4A4A4A',
-    marginBottom: 4,
+    color: colors.inkMuted,
+    marginBottom: spacing.xs,
   },
   sourceLink: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 8,
+    gap: spacing.sm,
     marginTop: 2,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   sourceLinkPressed: {
     opacity: 0.6,
   },
   sourceLinkText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: '700',
+    color: colors.tomato,
   },
   sourceDomain: {
     fontSize: 13,
-    color: '#9A9A9A',
+    color: colors.inkFaint,
   },
   originalTextBlock: {
-    marginTop: 8,
-    paddingLeft: 12,
+    marginTop: spacing.sm,
+    paddingLeft: spacing.md,
     borderLeftWidth: 2,
-    borderLeftColor: '#E5E5E5',
+    borderLeftColor: colors.tomato,
   },
   originalText: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#6B6B6B',
+    color: colors.inkMuted,
     fontStyle: 'italic',
   },
   personalLine: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#4A4A4A',
-    marginBottom: 6,
+    color: colors.ink,
+    marginBottom: spacing.sm - 2,
   },
   actionRow: {
-    marginTop: 8,
-    paddingTop: 24,
+    marginTop: spacing.xs,
+    paddingTop: spacing.xl,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E5E5',
+    borderTopColor: colors.hairline,
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   actionButton: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  editButton: {
-    borderColor: '#E5E5E5',
-    backgroundColor: '#FFFFFF',
-  },
-  editButtonPressed: {
-    backgroundColor: '#F0F0F0',
-  },
-  editButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  deleteButton: {
-    borderColor: '#E5484D',
-  },
-  deleteButtonPressed: {
-    backgroundColor: '#FDECEC',
-  },
-  deleteButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#E5484D',
   },
 });

@@ -8,6 +8,7 @@ import EditItemScreen from './src/screens/EditItemScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ItemDetailScreen from './src/screens/ItemDetailScreen';
 import { ItemsProvider } from './src/state/ItemsContext';
+import { colors } from './src/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -16,7 +17,14 @@ export default function App() {
     <KeyboardProvider>
       <ItemsProvider>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerTintColor: '#1A1A1A' }}>
+          <Stack.Navigator
+            screenOptions={{
+              headerTintColor: colors.ink,
+              headerStyle: { backgroundColor: colors.paper },
+              headerShadowVisible: false,
+              contentStyle: { backgroundColor: colors.paper },
+            }}
+          >
             <Stack.Screen
               name="Library"
               component={HomeScreen}
@@ -30,15 +38,15 @@ export default function App() {
             <Stack.Screen
               name="AddItem"
               component={AddItemScreen}
-              options={{ title: 'Add' }}
+              options={{ title: 'Add Item' }}
             />
             <Stack.Screen
               name="EditItem"
               component={EditItemScreen}
-              options={{ title: 'Edit' }}
+              options={{ title: 'Edit Item' }}
             />
           </Stack.Navigator>
-          <StatusBar style="auto" />
+          <StatusBar style="dark" />
         </NavigationContainer>
       </ItemsProvider>
     </KeyboardProvider>

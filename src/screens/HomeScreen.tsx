@@ -1,6 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,14 +7,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Button from '../components/Button';
 import ItemCard from '../components/ItemCard';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
+import { colors, radii, spacing, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Library'>;
 
 export default function HomeScreen({ navigation }: Props) {
   const { items } = useItems();
+  const year = new Date().getFullYear();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,40 +26,54 @@ export default function HomeScreen({ navigation }: Props) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Commonplace</Text>
+          <Text style={styles.eyebrow}>Personal Archive · Vol. I · {year}</Text>
+          <Text style={styles.logoLine}>Common</Text>
+          <Text style={[styles.logoLine, styles.logoAccentLine]}>
+            place<Text style={styles.logoDot}> ●</Text>
+          </Text>
           <Text style={styles.subtitle}>Everything worth remembering.</Text>
         </View>
 
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search your memory"
-          placeholderTextColor="#9A9A9A"
-          editable={false}
-        />
-
-        <Pressable
-          style={styles.button}
-          onPress={() => navigation.navigate('AddItem')}
-        >
-          <Text style={styles.buttonText}>+ Add</Text>
-        </Pressable>
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search your memory"
+            placeholderTextColor={colors.inkFaint}
+            editable={false}
+          />
+          <Button
+            label="+ Add"
+            onPress={() => navigation.navigate('AddItem')}
+            style={styles.addButton}
+          />
+        </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recently saved</Text>
+          <Text style={styles.sectionTitle}>
+            Recently saved — {items.length}{' '}
+            {items.length === 1 ? 'item' : 'items'}
+          </Text>
           {items.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>Nothing saved yet.</Text>
             </View>
           ) : (
-            items.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onPress={() =>
-                  navigation.navigate('ItemDetail', { itemId: item.id })
-                }
-              />
-            ))
+            <>
+              {items.map((item) => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  onPress={() =>
+                    navigation.navigate('ItemDetail', { itemId: item.id })
+                  }
+                />
+              ))}
+              <View style={styles.endDivider}>
+                <View style={styles.endLine} />
+                <Text style={styles.endText}>✦ End ✦</Text>
+                <View style={styles.endLine} />
+              </View>
+            </>
           )}
         </View>
       </ScrollView>
@@ -68,69 +84,90 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: colors.paper,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxl,
   },
   header: {
-    marginTop: 32,
-    marginBottom: 24,
+    marginTop: spacing.xl,
+    marginBottom: spacing.xl,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#1A1A1A',
+  eyebrow: {
+    ...typography.label,
+    marginBottom: spacing.sm,
+  },
+  logoLine: {
+    ...typography.displayXL,
+    lineHeight: 38,
+  },
+  logoAccentLine: {
+    color: colors.tomato,
+  },
+  logoDot: {
+    color: colors.mustard,
   },
   subtitle: {
-    marginTop: 8,
+    marginTop: spacing.sm,
     fontSize: 16,
-    color: '#6B6B6B',
+    fontStyle: 'italic',
+    color: colors.inkMuted,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   searchBar: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    flex: 1,
+    backgroundColor: colors.paperElevated,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderColor: colors.hairline,
+    paddingHorizontal: spacing.md + 2,
+    paddingVertical: spacing.sm + 2,
     fontSize: 15,
-    color: '#1A1A1A',
-    marginBottom: 16,
+    color: colors.ink,
   },
-  button: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+  addButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm + 2,
   },
   section: {
-    marginTop: 40,
+    marginTop: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 12,
+    ...typography.label,
+    marginBottom: spacing.md,
   },
   emptyState: {
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    paddingVertical: 32,
+    borderColor: colors.hairline,
+    paddingVertical: spacing.xxl,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyStateText: {
     fontSize: 15,
-    color: '#9A9A9A',
+    color: colors.inkFaint,
+  },
+  endDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    marginTop: spacing.lg,
+  },
+  endLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.hairlineStrong,
+  },
+  endText: {
+    ...typography.caption,
+    letterSpacing: 0.6,
   },
 });
