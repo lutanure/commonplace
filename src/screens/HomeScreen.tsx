@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,15 +10,27 @@ import {
   View,
 } from 'react-native';
 import Button from '../components/Button';
+import FilterChipRow from '../components/FilterChipRow';
 import ItemCard from '../components/ItemCard';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
+import { useLibrarySearch } from '../state/useLibrarySearch';
 import { colors, radii, spacing, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Library'>;
 
 export default function HomeScreen({ navigation }: Props) {
   const { items, isLoading, error, refresh } = useItems();
+  const {
+    query,
+    setQuery,
+    activeTypeFilter,
+    setActiveTypeFilter,
+    availableTypeFilters,
+    visibleItems,
+    hasActiveFilters,
+    clearFilters,
+  } = useLibrarySearch(items);
   const year = new Date().getFullYear();
 
   return (
@@ -36,12 +49,27 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.searchRow}>
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Search your memory"
-            placeholderTextColor={colors.inkFaint}
-            editable={false}
-          />
+          <View style={styles.searchInputWrap}>
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search your memory"
+              placeholderTextColor={colors.inkFaint}
+              value={query}
+              onChangeText={setQuery}
+              autoCorrect={false}
+              clearButtonMode="never"
+            />
+            {query.length > 0 ? (
+              <Pressable
+                accessibilityLabel="Clear search"
+                onPress={() => setQuery('')}
+                style={styles.clearButton}
+                hitSlop={8}
+              >
+                <Text style={styles.clearButtonText}>×</Text>
+              </Pressable>
+            ) : null}
+          </View>
           <Button
             label="+ Add"
             onPress={() => navigation.navigate('AddItem')}
@@ -49,13 +77,25 @@ export default function HomeScreen({ navigation }: Props) {
           />
         </View>
 
+        {!isLoading && !error && availableTypeFilters.length > 0 ? (
+          <FilterChipRow
+            filters={availableTypeFilters}
+            activeFilter={activeTypeFilter}
+            onSelect={setActiveTypeFilter}
+          />
+        ) : null}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             {isLoading || error
               ? 'Recently saved'
-              : `Recently saved — ${items.length} ${
-                  items.length === 1 ? 'item' : 'items'
-                }`}
+              : hasActiveFilters
+                ? `${visibleItems.length} ${
+                    visibleItems.length === 1 ? 'result' : 'results'
+                  }`
+                : `Recently saved — ${items.length} ${
+                    items.length === 1 ? 'item' : 'items'
+                  }`}
           </Text>
           {isLoading ? (
             <View style={styles.emptyState}>
@@ -77,9 +117,23 @@ export default function HomeScreen({ navigation }: Props) {
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateText}>Nothing saved yet.</Text>
             </View>
+          ) : visibleItems.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>
+                {query.trim()
+                  ? `No matches for “${query.trim()}”.`
+                  : 'No items match this filter.'}
+              </Text>
+              <Button
+                label="Clear filters"
+                variant="neutral"
+                onPress={clearFilters}
+                style={styles.retryButton}
+              />
+            </View>
           ) : (
             <>
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <ItemCard
                   key={item.id}
                   item={item}
@@ -140,16 +194,35 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
-  searchBar: {
+  searchInputWrap: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  searchBar: {
     backgroundColor: colors.paperElevated,
     borderRadius: radii.sm,
     borderWidth: 1,
     borderColor: colors.hairline,
     paddingHorizontal: spacing.md + 2,
+    paddingRight: spacing.xl + spacing.sm,
     paddingVertical: spacing.sm + 2,
     fontSize: 15,
     color: colors.ink,
+  },
+  clearButton: {
+    position: 'absolute',
+    right: spacing.sm + 2,
+    height: 22,
+    width: 22,
+    borderRadius: radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.paperMuted,
+  },
+  clearButtonText: {
+    fontSize: 15,
+    lineHeight: 16,
+    color: colors.inkMuted,
   },
   addButton: {
     paddingHorizontal: spacing.lg,
