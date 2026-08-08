@@ -1,7 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMemo, useState } from 'react';
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,6 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { Item, ItemType } from '../models';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
@@ -82,6 +86,7 @@ export default function AddItemScreen({ navigation }: Props) {
   }
 
   function closeTypePicker() {
+    Keyboard.dismiss();
     setTypePickerVisible(false);
     setTypeQuery('');
   }
@@ -146,93 +151,97 @@ export default function AddItemScreen({ navigation }: Props) {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.field}>
-        <Text style={styles.label}>Type</Text>
-        <Pressable style={styles.selector} onPress={openTypePicker}>
-          <Text style={styles.selectorText}>
-            {getItemTypeLabel({ type, captureType: 'manual', customTypeLabel })}
-          </Text>
-          <Text style={styles.selectorChevron}>⌄</Text>
-        </Pressable>
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Title</Text>
-        <TextInput
-          style={styles.input}
-          value={title}
-          onChangeText={setTitle}
-          placeholder="Give this a name"
-          placeholderTextColor="#9A9A9A"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>{contentField.label}</Text>
-        <TextInput
-          style={[styles.input, styles.multilineInput]}
-          value={content}
-          onChangeText={setContent}
-          placeholder={contentField.placeholder}
-          placeholderTextColor="#9A9A9A"
-          multiline
-          textAlignVertical="top"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Category (optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={category}
-          onChangeText={setCategory}
-          placeholder="e.g. product idea, travel, work"
-          placeholderTextColor="#9A9A9A"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Tags (optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={tagsInput}
-          onChangeText={setTagsInput}
-          placeholder="comma, separated, tags"
-          placeholderTextColor="#9A9A9A"
-          autoCapitalize="none"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Source URL (optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={sourceUrlInput}
-          onChangeText={setSourceUrlInput}
-          placeholder="example.com"
-          placeholderTextColor="#9A9A9A"
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
-      </View>
-
-      <Pressable
-        style={[styles.saveButton, !isValid && styles.saveButtonDisabled]}
-        onPress={handleSave}
-        disabled={!isValid}
+    <>
+      <KeyboardAwareScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        bottomOffset={24}
       >
-        <Text style={styles.saveButtonText}>Save</Text>
-      </Pressable>
+        <View style={styles.field}>
+          <Text style={styles.label}>Type</Text>
+          <Pressable style={styles.selector} onPress={openTypePicker}>
+            <Text style={styles.selectorText}>
+              {getItemTypeLabel({ type, captureType: 'manual', customTypeLabel })}
+            </Text>
+            <Text style={styles.selectorChevron}>⌄</Text>
+          </Pressable>
+        </View>
 
-      {validationMessage ? (
-        <Text style={styles.hint}>{validationMessage}</Text>
-      ) : null}
+        <View style={styles.field}>
+          <Text style={styles.label}>Title</Text>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Give this a name"
+            placeholderTextColor="#9A9A9A"
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>{contentField.label}</Text>
+          <TextInput
+            style={[styles.input, styles.multilineInput]}
+            value={content}
+            onChangeText={setContent}
+            placeholder={contentField.placeholder}
+            placeholderTextColor="#9A9A9A"
+            multiline
+            textAlignVertical="top"
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Category (optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={category}
+            onChangeText={setCategory}
+            placeholder="e.g. product idea, travel, work"
+            placeholderTextColor="#9A9A9A"
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Tags (optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={tagsInput}
+            onChangeText={setTagsInput}
+            placeholder="comma, separated, tags"
+            placeholderTextColor="#9A9A9A"
+            autoCapitalize="none"
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Source URL (optional)</Text>
+          <TextInput
+            style={styles.input}
+            value={sourceUrlInput}
+            onChangeText={setSourceUrlInput}
+            placeholder="example.com"
+            placeholderTextColor="#9A9A9A"
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+          />
+        </View>
+
+        <Pressable
+          style={[styles.saveButton, !isValid && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={!isValid}
+        >
+          <Text style={styles.saveButtonText}>Save</Text>
+        </Pressable>
+
+        {validationMessage ? (
+          <Text style={styles.hint}>{validationMessage}</Text>
+        ) : null}
+      </KeyboardAwareScrollView>
 
       <Modal
         visible={typePickerVisible}
@@ -241,77 +250,87 @@ export default function AddItemScreen({ navigation }: Props) {
         onRequestClose={closeTypePicker}
       >
         <Pressable style={styles.modalOverlay} onPress={closeTypePicker}>
-          <Pressable style={styles.modalSheet} onPress={() => {}}>
-            <Text style={styles.modalTitle}>What is this?</Text>
+          <KeyboardAvoidingView
+            style={styles.modalKeyboardAvoider}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
+            <Pressable style={styles.modalSheet} onPress={() => {}}>
+              <Text style={styles.modalTitle}>What is this?</Text>
 
-            <TextInput
-              style={styles.searchInput}
-              value={typeQuery}
-              onChangeText={setTypeQuery}
-              placeholder="Search or create a type"
-              placeholderTextColor="#9A9A9A"
-              autoFocus
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+              <TextInput
+                style={styles.searchInput}
+                value={typeQuery}
+                onChangeText={setTypeQuery}
+                placeholder="Search or create a type"
+                placeholderTextColor="#9A9A9A"
+                autoFocus
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-            <ScrollView style={styles.modalList} showsVerticalScrollIndicator={false}>
-              {typeSearch.builtIns.map((option) => {
-                const selected = type === option.value;
-                return (
-                  <Pressable
-                    key={option.value}
-                    style={styles.modalRow}
-                    onPress={() => selectBuiltInType(option.value)}
-                  >
-                    <Text
-                      style={[
-                        styles.modalRowText,
-                        selected && styles.modalRowTextSelected,
-                      ]}
+              <ScrollView
+                style={styles.modalList}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                showsVerticalScrollIndicator={false}
+              >
+                {typeSearch.builtIns.map((option) => {
+                  const selected = type === option.value;
+                  return (
+                    <Pressable
+                      key={option.value}
+                      style={styles.modalRow}
+                      onPress={() => selectBuiltInType(option.value)}
                     >
-                      {option.label}
-                    </Text>
-                    {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
-                  </Pressable>
-                );
-              })}
+                      <Text
+                        style={[
+                          styles.modalRowText,
+                          selected && styles.modalRowTextSelected,
+                        ]}
+                      >
+                        {option.label}
+                      </Text>
+                      {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                    </Pressable>
+                  );
+                })}
 
-              {typeSearch.customLabels.map((label) => {
-                const selected =
-                  type === 'other' &&
-                  normalizeTypeKey(customTypeLabel) === normalizeTypeKey(label);
-                return (
-                  <Pressable
-                    key={`custom-${label}`}
-                    style={styles.modalRow}
-                    onPress={() => selectCustomType(label)}
-                  >
-                    <Text
-                      style={[
-                        styles.modalRowText,
-                        selected && styles.modalRowTextSelected,
-                      ]}
+                {typeSearch.customLabels.map((label) => {
+                  const selected =
+                    type === 'other' &&
+                    normalizeTypeKey(customTypeLabel) === normalizeTypeKey(label);
+                  return (
+                    <Pressable
+                      key={`custom-${label}`}
+                      style={styles.modalRow}
+                      onPress={() => selectCustomType(label)}
                     >
-                      {label}
-                    </Text>
-                    {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
-                  </Pressable>
-                );
-              })}
+                      <Text
+                        style={[
+                          styles.modalRowText,
+                          selected && styles.modalRowTextSelected,
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                      {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                    </Pressable>
+                  );
+                })}
 
-              {canCreateType ? (
-                <Pressable style={styles.modalRow} onPress={createCustomType}>
-                  <Text style={styles.modalCreateText}>
-                    + Create "{trimmedTypeQuery}"
-                  </Text>
-                </Pressable>
-              ) : null}
-            </ScrollView>
-          </Pressable>
+                {canCreateType ? (
+                  <Pressable style={styles.modalRow} onPress={createCustomType}>
+                    <Text style={styles.modalCreateText}>
+                      + Create "{trimmedTypeQuery}"
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </ScrollView>
+            </Pressable>
+          </KeyboardAvoidingView>
         </Pressable>
       </Modal>
-    </ScrollView>
+    </>
   );
 }
 
@@ -392,6 +411,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'flex-end',
   },
+  // maxHeight lives here rather than on modalSheet: this is the direct
+  // child of modalOverlay (which has a definite flex:1 height), so the
+  // percentage resolves correctly. modalSheet is an auto-sized child of
+  // this view and would not resolve a percentage height on its own.
+  modalKeyboardAvoider: {
+    width: '100%',
+    maxHeight: '75%',
+  },
   modalSheet: {
     backgroundColor: '#FAFAFA',
     borderTopLeftRadius: 20,
@@ -399,7 +426,6 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingHorizontal: 24,
     paddingBottom: 32,
-    maxHeight: '75%',
   },
   modalTitle: {
     fontSize: 13,
