@@ -47,7 +47,10 @@ export interface TypeSearchResult {
 
 // Searches built-in types and previously-used custom labels by a simple
 // case-insensitive substring match. An empty query returns everything.
-export function searchItemTypes(query: string, items: Item[]): TypeSearchResult {
+export function searchItemTypes(
+  query: string,
+  items: Item[]
+): TypeSearchResult {
   const queryKey = normalizeTypeKey(query);
   const customLabels = getDistinctCustomTypeLabels(items);
 

@@ -34,12 +34,18 @@ async function openSourceUrl(url: string) {
   try {
     const supported = await Linking.canOpenURL(url);
     if (!supported) {
-      Alert.alert("Can't open this link", "This source link can't be opened on this device.");
+      Alert.alert(
+        "Can't open this link",
+        "This source link can't be opened on this device."
+      );
       return;
     }
     await Linking.openURL(url);
   } catch {
-    Alert.alert("Can't open this link", 'Something went wrong trying to open this link.');
+    Alert.alert(
+      "Can't open this link",
+      'Something went wrong trying to open this link.'
+    );
   }
 }
 
@@ -134,7 +140,9 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
             ) : null}
           </View>
 
-          <Text style={styles.savedDate}>Saved {formatDate(item.createdAt)}</Text>
+          <Text style={styles.savedDate}>
+            Saved {formatDate(item.createdAt)}
+          </Text>
         </View>
 
         {/* What Commonplace knows */}

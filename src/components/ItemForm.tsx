@@ -21,7 +21,9 @@ import { normalizeUrl } from '../utils/url';
 
 // Sensible per-type wording for the shared content field — not a unique
 // form per type, just a friendlier label/placeholder where it's easy.
-const CONTENT_FIELD: Partial<Record<ItemType, { label: string; placeholder: string }>> = {
+const CONTENT_FIELD: Partial<
+  Record<ItemType, { label: string; placeholder: string }>
+> = {
   idea: { label: 'Idea', placeholder: "What's the idea?" },
   note: { label: 'Note', placeholder: "What's on your mind?" },
   quote: { label: 'Quote', placeholder: 'The quote itself' },
@@ -94,7 +96,10 @@ export default function ItemForm({
     if (!urlIsValid) {
       return 'Enter a valid web address, e.g. example.com';
     }
-    if (!hasUrlInput && (trimmedTitle.length === 0 || trimmedContent.length === 0)) {
+    if (
+      !hasUrlInput &&
+      (trimmedTitle.length === 0 || trimmedContent.length === 0)
+    ) {
       return 'Title and content are required.';
     }
     return null;
@@ -165,7 +170,11 @@ export default function ItemForm({
           <Text style={styles.label}>Type</Text>
           <Pressable style={styles.selector} onPress={openTypePicker}>
             <Text style={styles.selectorText}>
-              {getItemTypeLabel({ type, captureType: 'manual', customTypeLabel })}
+              {getItemTypeLabel({
+                type,
+                captureType: 'manual',
+                customTypeLabel,
+              })}
             </Text>
             <Text style={styles.selectorChevron}>⌄</Text>
           </Pressable>
@@ -292,7 +301,9 @@ export default function ItemForm({
                       >
                         {option.label}
                       </Text>
-                      {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                      {selected ? (
+                        <Text style={styles.modalRowCheck}>✓</Text>
+                      ) : null}
                     </Pressable>
                   );
                 })}
@@ -300,7 +311,8 @@ export default function ItemForm({
                 {typeSearch.customLabels.map((label) => {
                   const selected =
                     type === 'other' &&
-                    normalizeTypeKey(customTypeLabel) === normalizeTypeKey(label);
+                    normalizeTypeKey(customTypeLabel) ===
+                      normalizeTypeKey(label);
                   return (
                     <Pressable
                       key={`custom-${label}`}
@@ -315,7 +327,9 @@ export default function ItemForm({
                       >
                         {label}
                       </Text>
-                      {selected ? <Text style={styles.modalRowCheck}>✓</Text> : null}
+                      {selected ? (
+                        <Text style={styles.modalRowCheck}>✓</Text>
+                      ) : null}
                     </Pressable>
                   );
                 })}
@@ -323,7 +337,7 @@ export default function ItemForm({
                 {canCreateType ? (
                   <Pressable style={styles.modalRow} onPress={createCustomType}>
                     <Text style={styles.modalCreateText}>
-                      + Create "{trimmedTypeQuery}"
+                      {`+ Create "${trimmedTypeQuery}"`}
                     </Text>
                   </Pressable>
                 ) : null}

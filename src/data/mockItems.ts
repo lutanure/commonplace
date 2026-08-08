@@ -51,7 +51,10 @@ export const mockItems: Item[] = [
       'Argues for "local-first" software that keeps data on-device for speed and ownership while still supporting real-time collaboration.',
     relevantInfo: [
       { label: 'Author', value: 'Ink & Switch research lab' },
-      { label: 'Core idea', value: 'Combine offline-first storage with CRDTs for multi-device sync' },
+      {
+        label: 'Core idea',
+        value: 'Combine offline-first storage with CRDTs for multi-device sync',
+      },
     ],
     tags: [tagArchitecture, tagReadLater],
     entities: ['Ink & Switch'],
@@ -70,7 +73,8 @@ export const mockItems: Item[] = [
     originalText:
       "Send a weekly email that resurfaces 3-5 saved items the user hasn't opened in a while, picked by relevance to what they've saved recently.",
     tags: [tagProductIdea],
-    whySaved: 'Came up during a walk, want to prototype this for Commonplace v2',
+    whySaved:
+      'Came up during a walk, want to prototype this for Commonplace v2',
   },
 
   // 4. A product screenshot
@@ -86,7 +90,8 @@ export const mockItems: Item[] = [
     mediaUri: 'file:///var/mobile/screenshots/IMG_4903.png',
     originalText:
       'AeroPress Go Travel Coffee Press — $39.95 — compact all-in-one coffee maker for travel and camping',
-    summary: 'Product listing for the AeroPress Go, a compact travel coffee maker.',
+    summary:
+      'Product listing for the AeroPress Go, a compact travel coffee maker.',
     relevantInfo: [
       { label: 'Product', value: 'AeroPress Go Travel Coffee Press' },
       { label: 'Price', value: '$39.95' },
@@ -108,7 +113,8 @@ export const mockItems: Item[] = [
     sourceName: 'Text from Maria',
     originalText:
       "Maria: you need to try Café Kitsuné if you're near Nolita, their matcha latte and brunch is amazing",
-    summary: 'Maria recommended Café Kitsuné in Nolita for brunch and matcha lattes.',
+    summary:
+      'Maria recommended Café Kitsuné in Nolita for brunch and matcha lattes.',
     relevantInfo: [
       { label: 'Name', value: 'Café Kitsuné' },
       { label: 'Neighborhood', value: 'Nolita, New York' },

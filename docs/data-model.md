@@ -7,8 +7,8 @@ edges) that should wait until we've used the app on real content.
 ## Why `src/models/`
 
 Domain entities live in their own directory, separate from UI components and any future
-persistence layer (Supabase tables, API clients, etc.). The models describe *what a saved thing
-is*, independent of how it's displayed or stored. This keeps the domain model reusable if the
+persistence layer (Supabase tables, API clients, etc.). The models describe _what a saved thing
+is_, independent of how it's displayed or stored. This keeps the domain model reusable if the
 storage or UI layer changes later, and gives AI-processing code a stable shape to read and write.
 
 ## `Item`
@@ -21,9 +21,10 @@ that are populated differently depending on what was saved and how far AI proces
 Fields are grouped by where the data comes from:
 
 ### Identity — always present, defines what the item fundamentally is
+
 - `id`, `title`, `type`, `customTypeLabel?`, `category`, `createdAt`, `updatedAt`
 
-**`type` is what the knowledge *is*, not how it arrived.** It's a fixed union of built-in semantic
+**`type` is what the knowledge _is_, not how it arrived.** It's a fixed union of built-in semantic
 types — `idea`, `note`, `article`, `book`, `movie`, `tv_show`, `song`, `podcast`, `product`,
 `place`, `recipe`, `quote`, `image`, `other` — describing the semantic identity of the saved
 information. A movie recommendation is `type: 'movie'` whether it was captured as a screenshot, a
@@ -41,7 +42,7 @@ name the thing without forcing a fixed vocabulary to grow unboundedly or forcing
 already is free text — see below) to carry two jobs at once. `customTypeLabel` is only meaningful
 when `type === 'other'`; it's ignored/absent for every built-in type.
 
-This is different from `category`, which is *always* free text regardless of `type` — `category` is
+This is different from `category`, which is _always_ free text regardless of `type` — `category` is
 the open-ended subject/topic classification (`entertainment`, `shopping`, ...), while `type` and
 `customTypeLabel` together are the semantic-identity classification. A `movie` can be `category:
 'entertainment'`; an `other` + `customTypeLabel: 'Wine'` item can be `category: 'gifts'`. They don't
@@ -50,6 +51,7 @@ be AI-generated or user-defined and shouldn't be constrained to a fixed vocabula
 deliberately is.
 
 ### Source / original content — comes from the original saved thing
+
 - `captureType`, `sourceName?`, `sourceUrl?`, `mediaUri?`, `originalText?`
 
 **`captureType` is how the item entered Commonplace, not what it's about.** It's a fixed union —
@@ -74,6 +76,7 @@ typed in by hand are both `type: 'movie'` — they only differ in `captureType` 
 purposes regardless of how a given item happened to be saved.
 
 ### AI / interpreted information — populated by AI analysis, may lag behind creation
+
 - `summary?`, `relevantInfo?`, `tags`, `entities?`
 
 These fields are meant to be filled in (or refined) after AI processes an item, so they're all
@@ -94,6 +97,7 @@ be promoted to a first-class domain object later if the graph or search architec
 have its own identity, the way `Tag` already does.
 
 ### Personal context — added by the user, not inferred
+
 - `userNote?`, `whySaved?`
 
 Freeform fields for the user's own reason for saving something or an ad-hoc note, kept distinct
@@ -121,7 +125,7 @@ be added if and when they're needed.
 ## What's deliberately postponed
 
 - **Graph edges / relationships** — no `relatedItems`, no tag-to-tag links, no "connects to"
-  concept yet. `Tag` is shaped so it *can* become a graph node later, but no edges exist yet.
+  concept yet. `Tag` is shaped so it _can_ become a graph node later, but no edges exist yet.
 - **Embeddings** — no vector field on `Item`. Semantic search will need this eventually, but it's
   an implementation detail of search, not part of the item's own identity.
 - **Similarity / confidence scores** — no AI-confidence or relevance-scoring fields. These belong

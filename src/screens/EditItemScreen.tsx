@@ -35,7 +35,10 @@ export default function EditItemScreen({ route, navigation }: Props) {
     return (
       <View style={styles.container}>
         <Text style={styles.notFound}>This item could not be found.</Text>
-        <Pressable style={styles.goBackButton} onPress={() => navigation.goBack()}>
+        <Pressable
+          style={styles.goBackButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.goBackButtonText}>Go back</Text>
         </Pressable>
       </View>
