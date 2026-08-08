@@ -1,8 +1,13 @@
 import type { Item } from '../models';
 import {
+  getAvailableTypeFilters,
+  getDistinctBuiltInTypes,
   getDistinctCustomTypeLabels,
+  isSameTypeFilter,
+  itemMatchesTypeFilter,
   normalizeTypeKey,
   searchItemTypes,
+  type TypeFilter,
 } from './typeTaxonomy';
 
 function makeItem(overrides: Partial<Item>): Item {
@@ -105,5 +110,134 @@ describe('searchItemTypes', () => {
 
   it('never reports an exact match for an empty query', () => {
     expect(searchItemTypes('', items).exactMatch).toBe(false);
+  });
+});
+
+describe('getDistinctBuiltInTypes', () => {
+  it('returns only built-in types with at least one item, in ITEM_TYPE_OPTIONS order', () => {
+    const items = [
+      makeItem({ type: 'book' }),
+      makeItem({ type: 'movie' }),
+      makeItem({ type: 'movie' }),
+      makeItem({ type: 'other', customTypeLabel: 'Research Paper' }),
+    ];
+    expect(getDistinctBuiltInTypes(items)).toEqual(['book', 'movie']);
+  });
+
+  it('never includes "other"', () => {
+    const items = [
+      makeItem({ type: 'other', customTypeLabel: 'Research Paper' }),
+    ];
+    expect(getDistinctBuiltInTypes(items)).toEqual([]);
+  });
+
+  it('returns an empty array for no items', () => {
+    expect(getDistinctBuiltInTypes([])).toEqual([]);
+  });
+});
+
+describe('getAvailableTypeFilters', () => {
+  it('combines built-in types in use and distinct custom labels in use', () => {
+    const items = [
+      makeItem({ type: 'movie' }),
+      makeItem({ type: 'other', customTypeLabel: 'Research Paper' }),
+      makeItem({ type: 'other', customTypeLabel: 'research paper' }),
+    ];
+    const filters = getAvailableTypeFilters(items);
+
+    expect(filters).toEqual([
+      {
+        key: 'builtin:movie',
+        label: 'Movie',
+        filter: { kind: 'builtin', value: 'movie' },
+      },
+      {
+        key: 'custom:research paper',
+        label: 'Research Paper',
+        filter: { kind: 'custom', label: 'Research Paper' },
+      },
+    ]);
+  });
+
+  it('returns an empty array for no items', () => {
+    expect(getAvailableTypeFilters([])).toEqual([]);
+  });
+});
+
+describe('itemMatchesTypeFilter', () => {
+  it('matches everything when the filter is null', () => {
+    expect(itemMatchesTypeFilter(makeItem({ type: 'movie' }), null)).toBe(true);
+  });
+
+  it('matches a builtin filter by exact type', () => {
+    const filter: TypeFilter = { kind: 'builtin', value: 'movie' };
+    expect(itemMatchesTypeFilter(makeItem({ type: 'movie' }), filter)).toBe(
+      true
+    );
+    expect(itemMatchesTypeFilter(makeItem({ type: 'book' }), filter)).toBe(
+      false
+    );
+  });
+
+  it('matches a custom filter case-insensitively against customTypeLabel', () => {
+    const filter: TypeFilter = { kind: 'custom', label: 'research paper' };
+    expect(
+      itemMatchesTypeFilter(
+        makeItem({ type: 'other', customTypeLabel: 'Research Paper' }),
+        filter
+      )
+    ).toBe(true);
+  });
+
+  it('does not let a custom filter match a builtin item with the same-looking type name', () => {
+    const filter: TypeFilter = { kind: 'custom', label: 'Movie' };
+    expect(itemMatchesTypeFilter(makeItem({ type: 'movie' }), filter)).toBe(
+      false
+    );
+  });
+});
+
+describe('isSameTypeFilter', () => {
+  it('treats two nulls as equal', () => {
+    expect(isSameTypeFilter(null, null)).toBe(true);
+  });
+
+  it('treats null and a filter as different', () => {
+    expect(isSameTypeFilter(null, { kind: 'builtin', value: 'movie' })).toBe(
+      false
+    );
+  });
+
+  it('compares builtin filters by value', () => {
+    expect(
+      isSameTypeFilter(
+        { kind: 'builtin', value: 'movie' },
+        { kind: 'builtin', value: 'movie' }
+      )
+    ).toBe(true);
+    expect(
+      isSameTypeFilter(
+        { kind: 'builtin', value: 'movie' },
+        { kind: 'builtin', value: 'book' }
+      )
+    ).toBe(false);
+  });
+
+  it('compares custom filters case-insensitively', () => {
+    expect(
+      isSameTypeFilter(
+        { kind: 'custom', label: 'Research Paper' },
+        { kind: 'custom', label: 'research paper' }
+      )
+    ).toBe(true);
+  });
+
+  it('never treats a builtin and custom filter as the same', () => {
+    expect(
+      isSameTypeFilter(
+        { kind: 'builtin', value: 'movie' },
+        { kind: 'custom', label: 'Movie' }
+      )
+    ).toBe(false);
   });
 });
