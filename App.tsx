@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import type { RootStackParamList } from './src/navigation/types';
 import AddItemScreen from './src/screens/AddItemScreen';
+import EditItemScreen from './src/screens/EditItemScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ItemDetailScreen from './src/screens/ItemDetailScreen';
 import { ItemsProvider } from './src/state/ItemsContext';
@@ -30,6 +31,11 @@ export default function App() {
               name="AddItem"
               component={AddItemScreen}
               options={{ title: 'Add' }}
+            />
+            <Stack.Screen
+              name="EditItem"
+              component={EditItemScreen}
+              options={{ title: 'Edit' }}
             />
           </Stack.Navigator>
           <StatusBar style="auto" />

@@ -74,7 +74,7 @@ function MediaPreview({ uri }: { uri: string }) {
 
 export default function ItemDetailScreen({ route, navigation }: Props) {
   const { itemId } = route.params;
-  const { getItemById } = useItems();
+  const { getItemById, deleteItem } = useItems();
   const item = getItemById(itemId);
 
   useEffect(() => {
@@ -89,6 +89,20 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
         </ScrollView>
       </View>
     );
+  }
+
+  function handleDeletePress() {
+    Alert.alert('Delete this item?', 'This action cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          deleteItem(itemId);
+          navigation.popToTop();
+        },
+      },
+    ]);
   }
 
   const hasKnowledge = Boolean(
@@ -208,6 +222,30 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
             ) : null}
           </Section>
         ) : null}
+
+        <View style={styles.actionRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.actionButton,
+              styles.editButton,
+              pressed && styles.editButtonPressed,
+            ]}
+            onPress={() => navigation.navigate('EditItem', { itemId: item.id })}
+          >
+            <Text style={styles.editButtonText}>Edit</Text>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.actionButton,
+              styles.deleteButton,
+              pressed && styles.deleteButtonPressed,
+            ]}
+            onPress={handleDeletePress}
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -365,5 +403,44 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: '#4A4A4A',
     marginBottom: 6,
+  },
+  actionRow: {
+    marginTop: 8,
+    paddingTop: 24,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E5E5',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  editButton: {
+    borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF',
+  },
+  editButtonPressed: {
+    backgroundColor: '#F0F0F0',
+  },
+  editButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1A1A',
+  },
+  deleteButton: {
+    borderColor: '#E5484D',
+  },
+  deleteButtonPressed: {
+    backgroundColor: '#FDECEC',
+  },
+  deleteButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#E5484D',
   },
 });
