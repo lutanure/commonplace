@@ -59,12 +59,12 @@ function AppShell() {
           <Stack.Screen
             name="AddItem"
             component={AddItemScreen}
-            options={{ title: 'Add Item' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="EditItem"
             component={EditItemScreen}
-            options={{ title: 'Edit Item' }}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
         <StatusBar style="dark" />

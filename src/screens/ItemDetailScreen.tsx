@@ -11,6 +11,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import BackControl from '../components/BackControl';
 import Button from '../components/Button';
 import Tag from '../components/Tag';
 import TypePill from '../components/TypePill';
@@ -81,23 +82,6 @@ function MediaPreview({ uri }: { uri: string }) {
   );
 }
 
-function BackControl({ onPress }: { onPress: () => void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={8}
-      accessibilityRole="button"
-      accessibilityLabel="Back to Library"
-      style={({ pressed }) => [
-        styles.backControl,
-        pressed && styles.backControlPressed,
-      ]}
-    >
-      <Text style={styles.backControlText}>‹ Library</Text>
-    </Pressable>
-  );
-}
-
 export default function ItemDetailScreen({ route, navigation }: Props) {
   const { itemId } = route.params;
   const { getItemById, deleteItem } = useItems();
@@ -106,7 +90,7 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
   if (!item) {
     return (
       <SafeAreaView style={styles.container}>
-        <BackControl onPress={() => navigation.goBack()} />
+        <BackControl label="Library" onPress={() => navigation.goBack()} />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.notFound}>This item could not be found.</Text>
         </ScrollView>
@@ -151,7 +135,7 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <BackControl onPress={() => navigation.goBack()} />
+      <BackControl label="Library" onPress={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Primary content */}
         <View style={styles.section}>
@@ -285,20 +269,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.paper,
-  },
-  backControl: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  backControlPressed: {
-    opacity: 0.6,
-  },
-  backControlText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.tomato,
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,

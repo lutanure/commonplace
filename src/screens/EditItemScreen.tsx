@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Alert, StyleSheet, Text, View } from 'react-native';
-import Button from '../components/Button';
+import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import BackControl from '../components/BackControl';
 import ItemForm, { type ItemFormResult } from '../components/ItemForm';
 import type { CaptureType, Item } from '../models';
 import type { RootStackParamList } from '../navigation/types';
@@ -35,10 +35,12 @@ export default function EditItemScreen({ route, navigation }: Props) {
 
   if (!item) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.notFound}>This item could not be found.</Text>
-        <Button label="Go back" onPress={() => navigation.goBack()} />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <BackControl label="Back" onPress={() => navigation.goBack()} />
+        <View style={styles.notFoundContainer}>
+          <Text style={styles.notFound}>This item could not be found.</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -71,13 +73,21 @@ export default function EditItemScreen({ route, navigation }: Props) {
     }
   }
 
-  return <ItemForm initialItem={editableItem} onSubmit={handleSubmit} />;
+  return (
+    <SafeAreaView style={styles.container}>
+      <BackControl label="Back" onPress={() => navigation.goBack()} />
+      <ItemForm initialItem={editableItem} onSubmit={handleSubmit} />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.paper,
+  },
+  notFoundContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xl,
@@ -86,6 +96,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.inkFaint,
     textAlign: 'center',
-    marginBottom: spacing.lg,
   },
 });

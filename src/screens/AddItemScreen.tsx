@@ -1,8 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Alert } from 'react-native';
+import { Alert, SafeAreaView, StyleSheet } from 'react-native';
+import BackControl from '../components/BackControl';
 import ItemForm, { type ItemFormResult } from '../components/ItemForm';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
+import { colors } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddItem'>;
 
@@ -33,5 +35,17 @@ export default function AddItemScreen({ navigation }: Props) {
     }
   }
 
-  return <ItemForm onSubmit={handleSubmit} />;
+  return (
+    <SafeAreaView style={styles.container}>
+      <BackControl label="Library" onPress={() => navigation.goBack()} />
+      <ItemForm onSubmit={handleSubmit} />
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.paper,
+  },
+});

@@ -125,24 +125,14 @@ export default function ItemForm({
     if (!urlIsValid) {
       return 'Enter a valid web address, e.g. example.com';
     }
-    if (
-      !hasUrlInput &&
-      (trimmedTitle.length === 0 || trimmedContent.length === 0)
-    ) {
-      return 'Title and content are required.';
+    if (!hasUrlInput && trimmedTitle.length === 0) {
+      return 'Title is required.';
     }
     if (type === 'other' && trimmedCustomTypeLabel.length === 0) {
       return 'Choose or create a type.';
     }
     return null;
-  }, [
-    urlIsValid,
-    hasUrlInput,
-    trimmedTitle,
-    trimmedContent,
-    type,
-    trimmedCustomTypeLabel,
-  ]);
+  }, [urlIsValid, hasUrlInput, trimmedTitle, type, trimmedCustomTypeLabel]);
 
   const isValid = validationMessage === null;
 
@@ -236,7 +226,7 @@ export default function ItemForm({
           </Pressable>
         </FormField>
 
-        <FormField label="Title">
+        <FormField label="Title *">
           <TextInput
             style={styles.input}
             value={title}
@@ -258,7 +248,7 @@ export default function ItemForm({
           />
         </FormField>
 
-        <FormField label="Category — optional">
+        <FormField label="Category">
           <TextInput
             style={styles.input}
             value={category}
@@ -268,7 +258,7 @@ export default function ItemForm({
           />
         </FormField>
 
-        <FormField label="Tags — optional">
+        <FormField label="Tags">
           <TextInput
             style={[styles.input, styles.inputDashed]}
             value={tagsInput}
@@ -279,7 +269,7 @@ export default function ItemForm({
           />
         </FormField>
 
-        <FormField label="Source — optional">
+        <FormField label="Source">
           <TextInput
             style={[styles.input, styles.inputDashed]}
             value={sourceNameInput}
@@ -289,7 +279,7 @@ export default function ItemForm({
           />
         </FormField>
 
-        <FormField label="Source URL — optional">
+        <FormField label="Source URL">
           <TextInput
             style={[styles.input, styles.inputDashed]}
             value={sourceUrlInput}
