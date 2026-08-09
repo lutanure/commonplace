@@ -17,6 +17,7 @@ export default function AddItemScreen({ navigation }: Props) {
         customTypeLabel: result.customTypeLabel,
         category: result.category,
         captureType: result.sourceUrl ? 'url' : 'manual',
+        sourceName: result.sourceName,
         sourceUrl: result.sourceUrl,
         originalText: result.originalText,
         tags: result.tags,

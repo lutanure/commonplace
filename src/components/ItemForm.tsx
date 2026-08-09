@@ -50,6 +50,7 @@ export interface ItemFormResult {
   originalText?: string;
   category?: string;
   tags: Tag[];
+  sourceName?: string;
   sourceUrl?: string;
 }
 
@@ -88,6 +89,9 @@ export default function ItemForm({
   const [typeQuery, setTypeQuery] = useState('');
   const [title, setTitle] = useState(initialItem?.title ?? '');
   const [content, setContent] = useState(initialItem?.originalText ?? '');
+  const [sourceNameInput, setSourceNameInput] = useState(
+    initialItem?.sourceName ?? ''
+  );
   const [sourceUrlInput, setSourceUrlInput] = useState(
     initialItem?.sourceUrl ?? ''
   );
@@ -193,6 +197,7 @@ export default function ItemForm({
         originalText: trimmedContent || undefined,
         category: category.trim() || undefined,
         tags,
+        sourceName: sourceNameInput.trim() || undefined,
         sourceUrl: normalizedUrl ?? undefined,
       });
     } catch {
@@ -231,7 +236,7 @@ export default function ItemForm({
           </Pressable>
         </FormField>
 
-        <FormField label="Title *">
+        <FormField label="Title">
           <TextInput
             style={styles.input}
             value={title}
@@ -271,6 +276,16 @@ export default function ItemForm({
             placeholder="e.g. love, film, 2024"
             placeholderTextColor={colors.inkFaint}
             autoCapitalize="none"
+          />
+        </FormField>
+
+        <FormField label="Source — optional">
+          <TextInput
+            style={[styles.input, styles.inputDashed]}
+            value={sourceNameInput}
+            onChangeText={setSourceNameInput}
+            placeholder="e.g. a person, a book, a podcast"
+            placeholderTextColor={colors.inkFaint}
           />
         </FormField>
 

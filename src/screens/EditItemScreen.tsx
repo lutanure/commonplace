@@ -55,6 +55,7 @@ export default function EditItemScreen({ route, navigation }: Props) {
         customTypeLabel: result.customTypeLabel,
         category: result.category,
         captureType: resolveCaptureType(editableItem, result.sourceUrl),
+        sourceName: result.sourceName,
         sourceUrl: result.sourceUrl,
         originalText: result.originalText,
         tags: result.tags,

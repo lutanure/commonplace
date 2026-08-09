@@ -143,9 +143,8 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
   const hasLabels = Boolean(
     item.tags.length > 0 || (item.entities && item.entities.length > 0)
   );
-  const hasSource = Boolean(
-    item.sourceName || item.sourceUrl || item.originalText
-  );
+  const hasContent = Boolean(item.originalText);
+  const hasSource = Boolean(item.sourceName || item.sourceUrl);
   const hasPersonalContext = Boolean(item.userNote || item.whySaved);
   const sourceUrl = item.sourceUrl;
   const sourceDomain = sourceUrl ? getDomain(sourceUrl) : undefined;
@@ -217,6 +216,15 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
           </Section>
         ) : null}
 
+        {/* Notes & content */}
+        {hasContent ? (
+          <Section title="Notes & content">
+            <View style={styles.originalTextBlock}>
+              <Text style={styles.originalText}>{item.originalText}</Text>
+            </View>
+          </Section>
+        ) : null}
+
         {/* Source */}
         {hasSource ? (
           <Section title="Source">
@@ -236,11 +244,6 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
                   <Text style={styles.sourceDomain}>{sourceDomain}</Text>
                 ) : null}
               </Pressable>
-            ) : null}
-            {item.originalText ? (
-              <View style={styles.originalTextBlock}>
-                <Text style={styles.originalText}>{item.originalText}</Text>
-              </View>
             ) : null}
           </Section>
         ) : null}
