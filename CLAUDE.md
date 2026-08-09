@@ -86,6 +86,7 @@ Data flow: **UI → `ItemsContext` → repository (`data/`) → `supabaseClient`
 `ItemsContext` never calls Supabase directly, and components never call repositories directly.
 
 Conventions:
+
 - Strict TypeScript throughout.
 - Tests colocated as `*.test.ts(x)`.
 - `src/data/mockItems.ts` is fixture data for tests only — it is **not** part of the production
