@@ -21,6 +21,8 @@ export interface ItemRow {
   entities: string[] | null;
   user_note: string | null;
   why_saved: string | null;
+  is_pinned: boolean;
+  pinned_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -33,9 +35,14 @@ export interface TagRow {
 }
 
 // Fields a caller may set when creating or updating an item. Deliberately
-// excludes id/createdAt/updatedAt (DB-owned) and tags (linked separately
-// via item_tags, not a column on `items`).
-export type ItemFields = Omit<Item, 'id' | 'createdAt' | 'updatedAt' | 'tags'>;
+// excludes id/createdAt/updatedAt/pinnedAt (DB-owned) and tags (linked
+// separately via item_tags, not a column on `items`). isPinned is
+// re-added as optional — it's required on a fetched Item, but a newly
+// created item is never pre-pinned, so callers shouldn't have to state it.
+export type ItemFields = Omit<
+  Item,
+  'id' | 'createdAt' | 'updatedAt' | 'pinnedAt' | 'tags' | 'isPinned'
+> & { isPinned?: boolean };
 
 export type NewItemInput = ItemFields & { tags: Tag[] };
 
@@ -63,12 +70,16 @@ export function toItem(row: ItemRow, tags: Tag[]): Item {
     entities: row.entities ?? undefined,
     userNote: row.user_note ?? undefined,
     whySaved: row.why_saved ?? undefined,
+    isPinned: row.is_pinned,
+    pinnedAt: row.pinned_at ?? undefined,
   };
 }
 
+// pinned_at excluded on top of the usual id/user_id/created_at/updated_at
+// — it's DB-owned (see ItemFields above), never written through this row.
 type ItemColumnRow = Omit<
   ItemRow,
-  'id' | 'user_id' | 'created_at' | 'updated_at'
+  'id' | 'user_id' | 'created_at' | 'updated_at' | 'pinned_at'
 >;
 
 // camelCase Item field -> snake_case `items` column, for every field a
@@ -89,6 +100,7 @@ const FIELD_TO_COLUMN: Record<keyof ItemFields, keyof ItemColumnRow> = {
   entities: 'entities',
   userNote: 'user_note',
   whySaved: 'why_saved',
+  isPinned: 'is_pinned',
 };
 
 export function toItemInsertRow(input: NewItemInput): ItemColumnRow {
@@ -99,6 +111,10 @@ export function toItemInsertRow(input: NewItemInput): ItemColumnRow {
   ][]) {
     (row as Record<string, unknown>)[column] = input[field] ?? null;
   }
+  // is_pinned is NOT NULL with a `false` default in Postgres — unlike
+  // every other column here, an explicit null would violate that
+  // constraint, so a new item with no isPinned given defaults to false.
+  row.is_pinned = input.isPinned ?? false;
   return row;
 }
 

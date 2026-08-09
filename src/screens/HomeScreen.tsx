@@ -31,21 +31,20 @@ export default function HomeScreen({ navigation }: Props) {
     hasActiveFilters,
     clearFilters,
   } = useLibrarySearch(items);
-  const year = new Date().getFullYear();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>Personal Archive · Vol. I · {year}</Text>
-          <Text style={styles.logoLine}>Common</Text>
-          <Text style={[styles.logoLine, styles.logoAccentLine]}>
-            place<Text style={styles.logoDot}> ●</Text>
+          <Text style={styles.logoLine}>
+            Common
+            <Text style={styles.logoAccentLine}>place</Text>
+            <Text style={styles.logoDot}> ●</Text>
           </Text>
-          <Text style={styles.subtitle}>Everything worth remembering.</Text>
         </View>
 
         <View style={styles.searchRow}>
@@ -168,10 +167,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     marginBottom: spacing.xl,
   },
-  eyebrow: {
-    ...typography.label,
-    marginBottom: spacing.sm,
-  },
   logoLine: {
     ...typography.displayXL,
     lineHeight: 38,
@@ -181,12 +176,6 @@ const styles = StyleSheet.create({
   },
   logoDot: {
     color: colors.mustard,
-  },
-  subtitle: {
-    marginTop: spacing.sm,
-    fontSize: 16,
-    fontStyle: 'italic',
-    color: colors.inkMuted,
   },
   searchRow: {
     flexDirection: 'row',

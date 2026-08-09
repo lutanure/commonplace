@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { Item } from '../models';
-import { getItemTypeColor, radii, spacing, typography } from '../theme';
+import { getItemDisplayColor, radii, spacing, typography } from '../theme';
 import { getItemTypeLabel } from '../utils/itemTypeLabel';
 
 // The main color-coded element for an Item's type — used on the library
@@ -11,7 +11,7 @@ export default function TypePill({
 }: {
   item: Pick<Item, 'type' | 'captureType' | 'customTypeLabel'>;
 }) {
-  const { background, text } = getItemTypeColor(item.type);
+  const { background, text } = getItemDisplayColor(item);
   const label = getItemTypeLabel(item);
 
   return (

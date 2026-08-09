@@ -50,6 +50,8 @@ export async function listItems(): Promise<Item[]> {
   const { data, error } = await supabase
     .from('items')
     .select(ITEM_SELECT)
+    .order('is_pinned', { ascending: false })
+    .order('pinned_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
   if (error) {
     throw error;

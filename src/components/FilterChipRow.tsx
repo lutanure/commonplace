@@ -1,5 +1,12 @@
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
-import { colors, getItemTypeColor, radii, spacing, typography } from '../theme';
+import {
+  colors,
+  getCustomTypeColor,
+  getItemTypeColor,
+  radii,
+  spacing,
+  typography,
+} from '../theme';
 import {
   isSameTypeFilter,
   type TypeFilter,
@@ -12,8 +19,9 @@ interface ChipColors {
 }
 
 // "All" reads as ink/cream (the app's default emphasis color, not tied to
-// any type); a custom-type chip reuses the same clay accent
-// itemTypeColors.ts already uses for the unclassified 'other' bucket.
+// any type); a custom-type chip gets its deterministic hash-based color
+// (see getCustomTypeColor) so the same custom type reads the same color
+// here as it does on its cards and detail page.
 function getChipColors(filter: TypeFilter | null): ChipColors {
   if (!filter) {
     return { background: colors.ink, text: colors.cream };
@@ -21,7 +29,7 @@ function getChipColors(filter: TypeFilter | null): ChipColors {
   if (filter.kind === 'builtin') {
     return getItemTypeColor(filter.value);
   }
-  return { background: colors.clay, text: colors.cream };
+  return getCustomTypeColor(filter.label);
 }
 
 function Chip({

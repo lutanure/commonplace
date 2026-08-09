@@ -1,10 +1,11 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Alert,
   Image,
   Linking,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -80,22 +81,36 @@ function MediaPreview({ uri }: { uri: string }) {
   );
 }
 
+function BackControl({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel="Back to Library"
+      style={({ pressed }) => [
+        styles.backControl,
+        pressed && styles.backControlPressed,
+      ]}
+    >
+      <Text style={styles.backControlText}>‹ Library</Text>
+    </Pressable>
+  );
+}
+
 export default function ItemDetailScreen({ route, navigation }: Props) {
   const { itemId } = route.params;
   const { getItemById, deleteItem } = useItems();
   const item = getItemById(itemId);
 
-  useEffect(() => {
-    navigation.setOptions({ title: item?.title ?? 'Item' });
-  }, [navigation, item?.title]);
-
   if (!item) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <BackControl onPress={() => navigation.goBack()} />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.notFound}>This item could not be found.</Text>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -136,7 +151,8 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
   const sourceDomain = sourceUrl ? getDomain(sourceUrl) : undefined;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <BackControl onPress={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Primary content */}
         <View style={styles.section}>
@@ -177,7 +193,7 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
 
         {/* Tags / entities */}
         {hasLabels ? (
-          <Section title="Tags & entities">
+          <Section title="Tags">
             {item.tags.length > 0 ? (
               <View style={styles.chipRow}>
                 {item.tags.map((tag) => (
@@ -258,7 +274,7 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -267,9 +283,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.paper,
   },
+  backControl: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  backControlPressed: {
+    opacity: 0.6,
+  },
+  backControlText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.tomato,
+  },
   scrollContent: {
     paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.xxl,
   },
   notFound: {

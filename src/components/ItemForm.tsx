@@ -16,7 +16,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { Item, ItemType, Tag } from '../models';
 import { useItems } from '../state/ItemsContext';
 import { colors, radii, spacing, typography } from '../theme';
-import { getItemTypeColor } from '../theme/itemTypeColors';
+import { getCustomTypeColor, getItemTypeColor } from '../theme/itemTypeColors';
 import { getItemTypeLabel } from '../utils/itemTypeLabel';
 import { parseTagsInput } from '../utils/tags';
 import { normalizeTypeKey, searchItemTypes } from '../utils/typeTaxonomy';
@@ -53,6 +53,8 @@ export interface ItemFormResult {
   sourceUrl?: string;
 }
 
+export type ItemFormSubmit = (result: ItemFormResult) => Promise<void>;
+
 function FormField({
   label,
   children,
@@ -73,9 +75,10 @@ export default function ItemForm({
   onSubmit,
 }: {
   initialItem?: Item;
-  onSubmit: (result: ItemFormResult) => void;
+  onSubmit: ItemFormSubmit;
 }) {
   const { items } = useItems();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [type, setType] = useState<ItemType>(initialItem?.type ?? 'idea');
   const [customTypeLabel, setCustomTypeLabel] = useState(
@@ -171,22 +174,34 @@ export default function ItemForm({
     closeTypePicker();
   }
 
-  function handleSave() {
-    if (!isValid) {
+  // Guarded by isSubmitting (not just isValid) so a second tap that lands
+  // before the first request resolves — e.g. from Save's own network
+  // latency — can never fire a second create/update for the same action.
+  async function handleSave() {
+    if (!isValid || isSubmitting) {
       return;
     }
 
     const tags = parseTagsInput(tagsInput, initialItem?.tags ?? []);
 
-    onSubmit({
-      type,
-      customTypeLabel: type === 'other' ? customTypeLabel.trim() : undefined,
-      title: trimmedTitle || normalizedUrl || '',
-      originalText: trimmedContent || undefined,
-      category: category.trim() || undefined,
-      tags,
-      sourceUrl: normalizedUrl ?? undefined,
-    });
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        type,
+        customTypeLabel: type === 'other' ? customTypeLabel.trim() : undefined,
+        title: trimmedTitle || normalizedUrl || '',
+        originalText: trimmedContent || undefined,
+        category: category.trim() || undefined,
+        tags,
+        sourceUrl: normalizedUrl ?? undefined,
+      });
+    } catch {
+      // The screen (AddItemScreen/EditItemScreen) owns user-facing error
+      // messaging (Alert) for its own request — ItemForm only needs to
+      // know the attempt finished so it can re-enable Save for a retry.
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -273,9 +288,9 @@ export default function ItemForm({
         </FormField>
 
         <Button
-          label="Save to Library"
+          label={isSubmitting ? 'Saving…' : 'Save to Library'}
           onPress={handleSave}
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           style={styles.saveButton}
         />
 
@@ -352,7 +367,7 @@ export default function ItemForm({
                     type === 'other' &&
                     normalizeTypeKey(customTypeLabel) ===
                       normalizeTypeKey(label);
-                  const { background } = getItemTypeColor('other');
+                  const { background } = getCustomTypeColor(label);
                   return (
                     <Pressable
                       key={`custom-${label}`}

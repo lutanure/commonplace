@@ -64,6 +64,8 @@ const itemRow = {
   entities: null,
   user_note: null,
   why_saved: null,
+  is_pinned: false,
+  pinned_at: null,
   created_at: '2020-01-01T00:00:00.000Z',
   updated_at: '2020-01-01T00:00:00.000Z',
 };
@@ -87,7 +89,14 @@ describe('listItems', () => {
 
     expect(mockedFrom).toHaveBeenCalledWith('items');
     expect(builder.select).toHaveBeenCalledWith('*, item_tags(tags(*))');
-    expect(builder.order).toHaveBeenCalledWith('created_at', {
+    expect(builder.order).toHaveBeenNthCalledWith(1, 'is_pinned', {
+      ascending: false,
+    });
+    expect(builder.order).toHaveBeenNthCalledWith(2, 'pinned_at', {
+      ascending: false,
+      nullsFirst: false,
+    });
+    expect(builder.order).toHaveBeenNthCalledWith(3, 'created_at', {
       ascending: false,
     });
     expect(items).toHaveLength(1);

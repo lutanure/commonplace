@@ -68,4 +68,11 @@ export interface Item {
   // Personal context
   userNote?: string;
   whySaved?: string;
+
+  // Organization
+  // pinnedAt is DB-owned (set by a trigger the moment isPinned flips to
+  // true, cleared on unpin) — never set it directly, see
+  // supabase/migrations/0003_add_item_pinning.sql.
+  isPinned: boolean;
+  pinnedAt?: string;
 }

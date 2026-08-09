@@ -18,6 +18,8 @@ const baseRow: ItemRow = {
   entities: null,
   user_note: null,
   why_saved: null,
+  is_pinned: false,
+  pinned_at: null,
   created_at: '2020-01-01T00:00:00.000Z',
   updated_at: '2020-01-02T00:00:00.000Z',
 };
@@ -56,6 +58,8 @@ describe('toItem', () => {
       entities: undefined,
       userNote: undefined,
       whySaved: undefined,
+      isPinned: false,
+      pinnedAt: undefined,
     });
   });
 
@@ -73,6 +77,8 @@ describe('toItem', () => {
       entities: ['Thing'],
       user_note: 'note',
       why_saved: 'why',
+      is_pinned: true,
+      pinned_at: '2020-01-03T00:00:00.000Z',
     };
     const tags = [{ id: 'tag-1', name: 'Travel' }];
 
@@ -89,6 +95,8 @@ describe('toItem', () => {
     expect(item.userNote).toBe('note');
     expect(item.whySaved).toBe('why');
     expect(item.tags).toBe(tags);
+    expect(item.isPinned).toBe(true);
+    expect(item.pinnedAt).toBe('2020-01-03T00:00:00.000Z');
   });
 });
 
@@ -116,6 +124,7 @@ describe('toItemInsertRow', () => {
       entities: null,
       user_note: null,
       why_saved: null,
+      is_pinned: false,
     });
   });
 
@@ -131,6 +140,27 @@ describe('toItemInsertRow', () => {
 
     expect(row.custom_type_label).toBe('Research paper');
     expect(row.source_url).toBe('https://example.com');
+  });
+
+  it('defaults is_pinned to false rather than null, since the column is NOT NULL', () => {
+    const row = toItemInsertRow({
+      title: 'New item',
+      type: 'idea',
+      captureType: 'manual',
+      tags: [],
+    });
+    expect(row.is_pinned).toBe(false);
+  });
+
+  it('passes through an explicit isPinned', () => {
+    const row = toItemInsertRow({
+      title: 'New item',
+      type: 'idea',
+      captureType: 'manual',
+      tags: [],
+      isPinned: true,
+    });
+    expect(row.is_pinned).toBe(true);
   });
 });
 
@@ -155,6 +185,13 @@ describe('toItemUpdateRow', () => {
       title: 'New title',
       category: 'ideas',
       capture_type: 'manual',
+    });
+  });
+
+  it('maps isPinned to is_pinned', () => {
+    expect(toItemUpdateRow({ isPinned: true })).toEqual({ is_pinned: true });
+    expect(toItemUpdateRow({ isPinned: false })).toEqual({
+      is_pinned: false,
     });
   });
 });

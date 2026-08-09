@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import type { RootStackParamList } from './src/navigation/types';
 import AddItemScreen from './src/screens/AddItemScreen';
@@ -53,7 +54,7 @@ function AppShell() {
           <Stack.Screen
             name="ItemDetail"
             component={ItemDetailScreen}
-            options={{ title: 'Item' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="AddItem"
@@ -74,15 +75,20 @@ function AppShell() {
 
 export default function App() {
   return (
-    <KeyboardProvider>
-      <AuthProvider>
-        <AppShell />
-      </AuthProvider>
-    </KeyboardProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <KeyboardProvider>
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
+      </KeyboardProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   centered: {
     flex: 1,
     backgroundColor: colors.paper,
