@@ -1,9 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { useBuiltInTypePreferences } from '../state/BuiltInTypePreferencesContext';
 import { useItems } from '../state/ItemsContext';
 import ItemForm from './ItemForm';
 
 jest.mock('../state/ItemsContext', () => ({
   useItems: jest.fn(),
+}));
+jest.mock('../state/BuiltInTypePreferencesContext', () => ({
+  useBuiltInTypePreferences: jest.fn(),
 }));
 
 // react-native-keyboard-controller isn't linked in the Jest environment
@@ -15,10 +19,19 @@ jest.mock('react-native-keyboard-controller', () => {
 });
 
 const mockedUseItems = useItems as jest.Mock;
+const mockedUseBuiltInTypePreferences = useBuiltInTypePreferences as jest.Mock;
 
 beforeEach(() => {
   mockedUseItems.mockReset();
   mockedUseItems.mockReturnValue({ items: [] });
+
+  mockedUseBuiltInTypePreferences.mockReset();
+  mockedUseBuiltInTypePreferences.mockReturnValue({
+    disabledTypes: [],
+    isLoading: false,
+    isTypeEnabled: () => true,
+    setTypeEnabled: jest.fn(),
+  });
 });
 
 // Deferred promise so the test controls exactly when onSubmit resolves,
@@ -100,5 +113,31 @@ describe('ItemForm double-submit protection', () => {
 
     fireEvent.press(screen.getByText('Save to Library'));
     expect(onSubmit).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('ItemForm type picker — disabled built-in types', () => {
+  it('excludes a disabled built-in type from the picker list', () => {
+    mockedUseBuiltInTypePreferences.mockReturnValue({
+      disabledTypes: ['article'],
+      isLoading: false,
+      isTypeEnabled: (type: string) => type !== 'article',
+      setTypeEnabled: jest.fn(),
+    });
+    render(<ItemForm onSubmit={jest.fn()} />);
+
+    fireEvent.press(screen.getByTestId('type-picker-trigger'));
+
+    expect(screen.queryByText('Article')).toBeNull();
+    expect(screen.getByText('Book')).toBeTruthy();
+  });
+
+  it('shows every built-in type in the picker when none are disabled', () => {
+    render(<ItemForm onSubmit={jest.fn()} />);
+
+    fireEvent.press(screen.getByTestId('type-picker-trigger'));
+
+    expect(screen.getByText('Article')).toBeTruthy();
+    expect(screen.getByText('Book')).toBeTruthy();
   });
 });

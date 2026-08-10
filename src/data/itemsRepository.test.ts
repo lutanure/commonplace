@@ -189,6 +189,45 @@ describe('updateItem', () => {
     expect(item.title).toBe('New title');
   });
 
+  // Regression test: Manage Types' custom-type deletion relies on
+  // `updateItem(id, { customTypeLabel: undefined })` actually clearing the
+  // column in the database patch, not silently omitting it. This proves
+  // the mapper layer does the right thing — the real bug turned out to be
+  // a DB CHECK constraint rejecting the resulting `custom_type_label:
+  // null` row for type='other' items (fixed in
+  // supabase/migrations/0004_allow_unlabeled_other_type.sql), not this
+  // undefined-to-null translation.
+  it('translates an explicit `undefined` field to `null` in the patch sent to Supabase, rather than omitting it', async () => {
+    const updateBuilder = makeBuilder({ data: null, error: null });
+    const fetchBuilder = makeBuilder({
+      data: { ...itemRow, custom_type_label: null, item_tags: [] },
+      error: null,
+    });
+    mockedFrom
+      .mockReturnValueOnce(updateBuilder)
+      .mockReturnValueOnce(fetchBuilder);
+
+    await updateItem('item-1', { customTypeLabel: undefined });
+
+    expect(updateBuilder.update).toHaveBeenCalledWith({
+      custom_type_label: null,
+    });
+  });
+
+  // Regression test: ManageTypesScreen counts a failed update via
+  // Promise.allSettled's rejection status, which only reflects reality if
+  // a real database error (e.g. a CHECK constraint violation) actually
+  // surfaces as a thrown/rejected error here, rather than being swallowed.
+  it('throws when Supabase returns an update error (e.g. a constraint violation)', async () => {
+    mockedFrom.mockReturnValueOnce(
+      makeBuilder({ data: null, error: new Error('constraint violated') })
+    );
+
+    await expect(
+      updateItem('item-1', { customTypeLabel: undefined })
+    ).rejects.toThrow('constraint violated');
+  });
+
   it('replaces item_tags links when tags are given', async () => {
     const deleteBuilder = makeBuilder({ data: null, error: null });
     const linkBuilder = makeBuilder({ data: null, error: null });

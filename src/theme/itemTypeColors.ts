@@ -1,5 +1,5 @@
 import type { Item, ItemType } from '../models';
-import { colors } from './colors';
+import { typeColors } from './typeColors';
 
 export interface ItemTypeColor {
   background: string;
@@ -18,20 +18,20 @@ export interface ItemTypeColor {
 //  - navy: reference / object (article, product, image)
 //  - clay: the unclassified fallback (other)
 const TYPE_COLORS: Record<ItemType, ItemTypeColor> = {
-  idea: { background: colors.mustard, text: colors.ink },
-  note: { background: colors.mustard, text: colors.ink },
-  article: { background: colors.navy, text: colors.cream },
-  book: { background: colors.olive, text: colors.cream },
-  quote: { background: colors.olive, text: colors.cream },
-  movie: { background: colors.tomato, text: colors.cream },
-  tv_show: { background: colors.tomato, text: colors.cream },
-  song: { background: colors.plum, text: colors.cream },
-  podcast: { background: colors.plum, text: colors.cream },
-  product: { background: colors.navy, text: colors.cream },
-  place: { background: colors.teal, text: colors.cream },
-  recipe: { background: colors.teal, text: colors.cream },
-  image: { background: colors.navy, text: colors.cream },
-  other: { background: colors.clay, text: colors.cream },
+  idea: { background: typeColors.mustard, text: typeColors.ink },
+  note: { background: typeColors.mustard, text: typeColors.ink },
+  article: { background: typeColors.navy, text: typeColors.cream },
+  book: { background: typeColors.olive, text: typeColors.cream },
+  quote: { background: typeColors.olive, text: typeColors.cream },
+  movie: { background: typeColors.tomato, text: typeColors.cream },
+  tv_show: { background: typeColors.tomato, text: typeColors.cream },
+  song: { background: typeColors.plum, text: typeColors.cream },
+  podcast: { background: typeColors.plum, text: typeColors.cream },
+  product: { background: typeColors.navy, text: typeColors.cream },
+  place: { background: typeColors.teal, text: typeColors.cream },
+  recipe: { background: typeColors.teal, text: typeColors.cream },
+  image: { background: typeColors.navy, text: typeColors.cream },
+  other: { background: typeColors.clay, text: typeColors.cream },
 };
 
 export function getItemTypeColor(type: ItemType): ItemTypeColor {
@@ -47,12 +47,12 @@ export function getItemTypeColor(type: ItemType): ItemTypeColor {
 // type (clay) never gets confused with the hashed choice for a labeled
 // one, e.g. a custom type someone names "Other".
 const CUSTOM_TYPE_PALETTE: ItemTypeColor[] = [
-  { background: colors.tomato, text: colors.cream },
-  { background: colors.olive, text: colors.cream },
-  { background: colors.mustard, text: colors.ink },
-  { background: colors.teal, text: colors.cream },
-  { background: colors.plum, text: colors.cream },
-  { background: colors.navy, text: colors.cream },
+  { background: typeColors.tomato, text: typeColors.cream },
+  { background: typeColors.olive, text: typeColors.cream },
+  { background: typeColors.mustard, text: typeColors.ink },
+  { background: typeColors.teal, text: typeColors.cream },
+  { background: typeColors.plum, text: typeColors.cream },
+  { background: typeColors.navy, text: typeColors.cream },
 ];
 
 // A small, deterministic string hash (no runtime randomness) — good

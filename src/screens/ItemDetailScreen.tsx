@@ -268,7 +268,7 @@ export default function ItemDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   notFound: {
     fontSize: 15,
-    color: colors.inkFaint,
+    color: colors.textFaint,
     marginTop: spacing.xxl,
     textAlign: 'center',
   },
@@ -292,21 +292,21 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 4 / 3,
     borderRadius: radii.sm,
-    backgroundColor: colors.paperMuted,
+    backgroundColor: colors.surfaceSunken,
     marginBottom: spacing.lg,
   },
   mediaPlaceholder: {
     width: '100%',
     aspectRatio: 4 / 3,
     borderRadius: radii.sm,
-    backgroundColor: colors.paperMuted,
+    backgroundColor: colors.surfaceSunken,
     marginBottom: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   mediaPlaceholderText: {
     fontSize: 14,
-    color: colors.inkFaint,
+    color: colors.textFaint,
   },
   title: {
     ...typography.displayLG,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   category: {
     marginTop: spacing.xs + 2,
     fontSize: 13,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
   },
   savedDate: {
     marginTop: spacing.sm,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   summary: {
     fontSize: 15,
     lineHeight: 22,
-    color: colors.ink,
+    color: colors.textPrimary,
   },
   factsList: {
     marginTop: spacing.md + 2,
@@ -334,16 +334,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.hairline,
+    borderTopColor: colors.border,
   },
   factLabel: {
     fontSize: 14,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
   },
   factValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.ink,
+    color: colors.textPrimary,
     marginLeft: spacing.md,
     flexShrink: 1,
     textAlign: 'right',
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   sourceLine: {
     fontSize: 14,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   sourceLink: {
@@ -375,35 +375,35 @@ const styles = StyleSheet.create({
   sourceLinkText: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.tomato,
+    color: colors.accent,
   },
   sourceDomain: {
     fontSize: 13,
-    color: colors.inkFaint,
+    color: colors.textFaint,
   },
   originalTextBlock: {
     marginTop: spacing.sm,
     paddingLeft: spacing.md,
     borderLeftWidth: 2,
-    borderLeftColor: colors.tomato,
+    borderLeftColor: colors.accent,
   },
   originalText: {
     fontSize: 14,
     lineHeight: 20,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
   personalLine: {
     fontSize: 15,
     lineHeight: 22,
-    color: colors.ink,
+    color: colors.textPrimary,
     marginBottom: spacing.sm - 2,
   },
   actionRow: {
     marginTop: spacing.xs,
     paddingTop: spacing.xl,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.hairline,
+    borderTopColor: colors.border,
     flexDirection: 'row',
     gap: spacing.md,
   },

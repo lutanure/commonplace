@@ -12,6 +12,7 @@ import {
 import Button from '../components/Button';
 import FilterChipRow from '../components/FilterChipRow';
 import ItemCard from '../components/ItemCard';
+import SettingsIcon from '../components/SettingsIcon';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
 import { useLibrarySearch } from '../state/useLibrarySearch';
@@ -29,6 +30,7 @@ export default function HomeScreen({ navigation }: Props) {
     availableTypeFilters,
     visibleItems,
     hasActiveFilters,
+    isLibraryCapped,
     clearFilters,
   } = useLibrarySearch(items);
 
@@ -45,6 +47,18 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={styles.logoAccentLine}>place</Text>
             <Text style={styles.logoDot}> ●</Text>
           </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+            hitSlop={8}
+            onPress={() => navigation.navigate('Settings')}
+            style={({ pressed }) => [
+              styles.settingsButton,
+              pressed && styles.settingsButtonPressed,
+            ]}
+          >
+            <SettingsIcon size={16} color={colors.accent} />
+          </Pressable>
         </View>
 
         <View style={styles.searchRow}>
@@ -52,7 +66,7 @@ export default function HomeScreen({ navigation }: Props) {
             <TextInput
               style={styles.searchBar}
               placeholder="Search your memory"
-              placeholderTextColor={colors.inkFaint}
+              placeholderTextColor={colors.textFaint}
               value={query}
               onChangeText={setQuery}
               autoCorrect={false}
@@ -92,13 +106,15 @@ export default function HomeScreen({ navigation }: Props) {
                 ? `${visibleItems.length} ${
                     visibleItems.length === 1 ? 'result' : 'results'
                   }`
-                : `Recently saved — ${items.length} ${
-                    items.length === 1 ? 'item' : 'items'
-                  }`}
+                : isLibraryCapped
+                  ? 'Recently saved'
+                  : `Recently saved — ${items.length} ${
+                      items.length === 1 ? 'item' : 'items'
+                    }`}
           </Text>
           {isLoading ? (
             <View style={styles.emptyState}>
-              <ActivityIndicator color={colors.ink} />
+              <ActivityIndicator color={colors.textPrimary} />
             </View>
           ) : error ? (
             <View style={styles.emptyState}>
@@ -141,11 +157,13 @@ export default function HomeScreen({ navigation }: Props) {
                   }
                 />
               ))}
-              <View style={styles.endDivider}>
-                <View style={styles.endLine} />
-                <Text style={styles.endText}>✦ End ✦</Text>
-                <View style={styles.endLine} />
-              </View>
+              {isLibraryCapped ? null : (
+                <View style={styles.endDivider}>
+                  <View style={styles.endLine} />
+                  <Text style={styles.endText}>✦ End ✦</Text>
+                  <View style={styles.endLine} />
+                </View>
+              )}
             </>
           )}
         </View>
@@ -157,25 +175,44 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxl,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: spacing.xl,
     marginBottom: spacing.xl,
+  },
+  settingsButton: {
+    width: 36,
+    height: 36,
+    borderRadius: radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  settingsButtonPressed: {
+    backgroundColor: colors.surfaceSunken,
   },
   logoLine: {
     ...typography.displayXL,
     lineHeight: 38,
   },
+  // Plum carries the app's strongest brand identity; the dot gets a small
+  // pop of the rust action accent — together the wordmark's one deliberate
+  // Bowlby One + full core-palette moment in the app.
   logoAccentLine: {
-    color: colors.tomato,
+    color: colors.primary,
   },
   logoDot: {
-    color: colors.mustard,
+    color: colors.accent,
   },
   searchRow: {
     flexDirection: 'row',
@@ -188,15 +225,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchBar: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     paddingHorizontal: spacing.md + 2,
     paddingRight: spacing.xl + spacing.sm,
     paddingVertical: spacing.sm + 2,
     fontSize: 15,
-    color: colors.ink,
+    color: colors.textPrimary,
   },
   clearButton: {
     position: 'absolute',
@@ -206,12 +243,12 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.paperMuted,
+    backgroundColor: colors.surfaceSunken,
   },
   clearButtonText: {
     fontSize: 15,
     lineHeight: 16,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
   },
   addButton: {
     paddingHorizontal: spacing.lg,
@@ -227,14 +264,14 @@ const styles = StyleSheet.create({
   emptyState: {
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     paddingVertical: spacing.xxl,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyStateText: {
     fontSize: 15,
-    color: colors.inkFaint,
+    color: colors.textFaint,
   },
   retryButton: {
     marginTop: spacing.lg,
@@ -250,7 +287,7 @@ const styles = StyleSheet.create({
   endLine: {
     flex: 1,
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.hairlineStrong,
+    backgroundColor: colors.borderStrong,
   },
   endText: {
     ...typography.caption,

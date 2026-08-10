@@ -44,6 +44,8 @@ describe('buildSearchHaystack', () => {
       entities: ['Paul Atreides', 'Arrakis'],
       sourceName: 'IMDb',
       sourceUrl: 'https://imdb.com/title/dune',
+      whySaved: 'Recommended by Jess',
+      relevantInfo: [{ label: 'Director', value: 'Denis Villeneuve' }],
     });
     const haystack = buildSearchHaystack(item);
 
@@ -57,6 +59,9 @@ describe('buildSearchHaystack', () => {
     expect(haystack).toContain('arrakis');
     expect(haystack).toContain('imdb');
     expect(haystack).toContain('imdb.com/title/dune');
+    expect(haystack).toContain('recommended by jess');
+    expect(haystack).toContain('director');
+    expect(haystack).toContain('denis villeneuve');
   });
 
   it('includes a custom type label via getItemTypeLabel', () => {
@@ -67,6 +72,14 @@ describe('buildSearchHaystack', () => {
   it('does not throw when optional fields are missing', () => {
     const item = makeItem();
     expect(() => buildSearchHaystack(item)).not.toThrow();
+  });
+});
+
+describe('Source search regression', () => {
+  it('finds an item by its Source (sourceName), case-insensitively', () => {
+    const item = makeItem({ title: 'Banana bread', sourceName: 'Mom' });
+    expect(itemMatchesQuery(item, 'mom')).toBe(true);
+    expect(filterItemsByQuery([item], 'mom')).toEqual([item]);
   });
 });
 

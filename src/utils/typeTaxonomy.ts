@@ -2,9 +2,16 @@ import type { Item, ItemType } from '../models';
 import { ITEM_TYPE_OPTIONS } from './itemTypeLabel';
 
 // The built-in type list minus 'other' — 'other' is how a custom type is
-// represented internally, not something a user picks directly.
-const SELECTABLE_BUILT_INS = ITEM_TYPE_OPTIONS.filter(
+// represented internally, not something a user picks directly. Exported
+// (array + Set) so other modules that need to validate/enumerate "real"
+// built-in types (Quick Add sanitization, built-in type visibility
+// preferences) share this one definition instead of re-deriving it.
+export const SELECTABLE_BUILT_INS = ITEM_TYPE_OPTIONS.filter(
   (option) => option.value !== 'other'
+);
+
+export const SELECTABLE_BUILT_IN_TYPES = new Set<ItemType>(
+  SELECTABLE_BUILT_INS.map((option) => option.value)
 );
 
 // Case-insensitive comparison key for a type name/label.
@@ -34,6 +41,18 @@ export function getDistinctCustomTypeLabels(items: Item[]): string[] {
   }
 
   return Array.from(seen.values());
+}
+
+// All items currently using the given custom type label (case/whitespace-
+// insensitive, matching getDistinctCustomTypeLabels' own dedup rule) — used
+// by Manage Types to size and carry out a deletion's impact.
+export function getItemsUsingCustomType(items: Item[], label: string): Item[] {
+  const key = normalizeTypeKey(label);
+  return items.filter(
+    (item) =>
+      item.type === 'other' &&
+      normalizeTypeKey(item.customTypeLabel ?? '') === key
+  );
 }
 
 // A structured filter value rather than a raw label string, so a built-in

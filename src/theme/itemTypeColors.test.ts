@@ -1,4 +1,4 @@
-import { colors } from './colors';
+import { typeColors } from './typeColors';
 import {
   getCustomTypeColor,
   getItemDisplayColor,
@@ -58,8 +58,8 @@ describe('getItemDisplayColor', () => {
   it('falls back to the fixed "other" color when a custom type has no label', () => {
     const item = { type: 'other' as const, customTypeLabel: undefined };
     expect(getItemDisplayColor(item)).toEqual({
-      background: colors.clay,
-      text: colors.cream,
+      background: typeColors.clay,
+      text: typeColors.cream,
     });
   });
 

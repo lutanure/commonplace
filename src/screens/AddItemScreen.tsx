@@ -46,6 +46,6 @@ export default function AddItemScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
   },
 });

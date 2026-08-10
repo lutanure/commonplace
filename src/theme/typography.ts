@@ -1,75 +1,86 @@
-import { Platform } from 'react-native';
 import { colors } from './colors';
+import { fontFamily } from './fonts';
 
-// "Strong display typography" for major titles, achieved with a built-in
-// platform serif (Georgia on iOS, the generic "serif" family on Android)
-// rather than a bundled font file — keeps the editorial feel without any
-// extra asset weight or load-time cost. Reserved for the brand wordmark,
-// major screen titles, and occasional editorial emphasis (e.g. the type
-// selector's preview text) — NOT for scannable list content. Body/
-// interface text, and now card titles too, stay on the platform's
-// default system sans-serif for clean modern readability and faster
-// scanning.
-const displayFontFamily = Platform.select({ ios: 'Georgia', android: 'serif' });
-
+// Bowlby One is a single-weight display face, reserved for the brand
+// wordmark and other major, *intentional* brand moments — never body copy,
+// long headings, or anything that can hold arbitrary-length user content
+// (e.g. an item's title). `displayXL` is the only token that uses it, and
+// it's used in exactly one place: the "Commonplace" wordmark. Everything
+// else, including the other "display" sizes below, stays on Instrument
+// Sans (bold) — still prominent, just not the brand face. Each Instrument
+// Sans weight is its own font file (loaded in App.tsx), so styles below
+// pair a specific `fontFamily` with `fontWeight: '400'` rather than relying
+// on fontWeight to synthesize bold — that synthesis is unreliable for
+// custom fonts, especially on Android.
 export const typography = {
   displayXL: {
-    fontFamily: displayFontFamily,
-    fontSize: 34,
-    fontWeight: '700' as const,
-    color: colors.ink,
+    fontFamily: fontFamily.display,
+    fontSize: 32,
+    fontWeight: '400' as const,
+    color: colors.textPrimary,
     letterSpacing: -0.5,
   },
+  // A large bold heading (e.g. the Item Detail title) — arbitrary-length
+  // user content, so deliberately on Instrument Sans, not the display face.
   displayLG: {
-    fontFamily: displayFontFamily,
-    fontSize: 26,
-    fontWeight: '700' as const,
-    color: colors.ink,
-    lineHeight: 32,
+    fontFamily: fontFamily.bodyBold,
+    fontSize: 24,
+    fontWeight: '400' as const,
+    color: colors.textPrimary,
+    lineHeight: 30,
   },
-  // Smaller serif display, for occasional editorial emphasis rather than
-  // scannable lists (e.g. the type picker's selected-type preview text).
-  // Card titles deliberately do NOT use this — see `cardTitle` below.
+  // A smaller bold heading for prominent-but-short UI text (e.g. the type
+  // picker's selected-type preview, a modal title). Card titles
+  // deliberately do NOT use this — see `cardTitle` below.
   displayMD: {
-    fontFamily: displayFontFamily,
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: colors.ink,
-    lineHeight: 23,
+    fontFamily: fontFamily.bodySemiBold,
+    fontSize: 16,
+    fontWeight: '400' as const,
+    color: colors.textPrimary,
+    lineHeight: 21,
   },
-  // Library card titles: still prominent (bold, sizeable), but on the
-  // system sans-serif rather than the display serif, so a list of cards
-  // reads and scans faster than a list of editorial headlines would.
+  // Library card titles: still prominent (bold, sizeable), but on the UI
+  // typeface rather than the display face, so a list of cards reads and
+  // scans faster than a list of editorial headlines would.
   cardTitle: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 17,
-    fontWeight: '700' as const,
-    color: colors.ink,
+    fontWeight: '400' as const,
+    color: colors.textPrimary,
     lineHeight: 22,
     letterSpacing: -0.2,
   },
   body: {
+    fontFamily: fontFamily.body,
     fontSize: 15,
-    color: colors.ink,
+    fontWeight: '400' as const,
+    color: colors.textPrimary,
     lineHeight: 21,
   },
   bodyMuted: {
+    fontFamily: fontFamily.body,
     fontSize: 14,
-    color: colors.inkMuted,
+    fontWeight: '400' as const,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   label: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 11,
-    fontWeight: '700' as const,
-    color: colors.inkMuted,
+    fontWeight: '400' as const,
+    color: colors.textSecondary,
     textTransform: 'uppercase' as const,
     letterSpacing: 0.8,
   },
   caption: {
+    fontFamily: fontFamily.body,
     fontSize: 12,
-    color: colors.inkFaint,
+    fontWeight: '400' as const,
+    color: colors.textFaint,
   },
   button: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 15,
-    fontWeight: '700' as const,
+    fontWeight: '400' as const,
   },
 } as const;

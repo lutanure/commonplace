@@ -177,15 +177,15 @@ export default function ItemCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
   cardPressed: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
   },
   headerRow: {
     flexDirection: 'row',
@@ -197,9 +197,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  // Reuses the core palette's quiet olive accent for the pin indicator —
+  // this is not type/tag color-coding, just a reused hue for a UI state.
   pinnedLabel: {
     ...typography.label,
-    color: colors.mustard,
+    color: colors.olive,
   },
   date: {
     ...typography.caption,
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
   },
   pinAction: {
     marginRight: spacing.sm,
-    backgroundColor: colors.mustard,
+    backgroundColor: colors.olive,
   },
   actionText: {
     ...typography.button,

@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
   backControlText: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.tomato,
+    color: colors.accent,
   },
 });

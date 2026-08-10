@@ -17,6 +17,9 @@ export function normalizeSearchText(value: string): string {
 // blob per item. `getItemTypeLabel` already resolves the built-in label,
 // custom type label, or "Link" fallback, so type/customTypeLabel search
 // falls out of reusing it rather than re-deriving that logic here.
+// `sourceName`/`sourceUrl` cover everything the UI presents under "Source"
+// (see ItemDetailScreen's Source section) — there is no separate
+// author/attribution field on the model beyond sourceName.
 function searchableFields(item: Item): (string | undefined)[] {
   return [
     item.title,
@@ -29,6 +32,8 @@ function searchableFields(item: Item): (string | undefined)[] {
     ...(item.entities ?? []),
     item.sourceName,
     item.sourceUrl,
+    item.whySaved,
+    ...(item.relevantInfo ?? []).flatMap((fact) => [fact.label, fact.value]),
   ];
 }
 

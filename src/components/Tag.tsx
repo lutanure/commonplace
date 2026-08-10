@@ -17,20 +17,20 @@ export default function Tag({
 
 const styles = StyleSheet.create({
   chip: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: 4,
   },
   chipOutline: {
     backgroundColor: 'transparent',
-    borderColor: colors.hairlineStrong,
+    borderColor: colors.borderStrong,
   },
   text: {
     fontSize: 12,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },

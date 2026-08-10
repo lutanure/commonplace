@@ -84,7 +84,7 @@ export default function EditItemScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
   },
   notFoundContainer: {
     flex: 1,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   notFound: {
     fontSize: 15,
-    color: colors.inkFaint,
+    color: colors.textFaint,
     textAlign: 'center',
   },
 });

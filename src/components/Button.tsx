@@ -12,24 +12,24 @@ interface VariantStyle {
 
 const VARIANTS: Record<ButtonVariant, VariantStyle> = {
   primary: {
-    container: { backgroundColor: colors.tomato, borderColor: colors.tomato },
+    container: { backgroundColor: colors.accent, borderColor: colors.accent },
     pressed: {
-      backgroundColor: colors.tomatoDark,
-      borderColor: colors.tomatoDark,
+      backgroundColor: colors.accentPressed,
+      borderColor: colors.accentPressed,
     },
     label: { color: colors.cream },
   },
   neutral: {
     container: {
-      backgroundColor: colors.paperElevated,
-      borderColor: colors.hairlineStrong,
+      backgroundColor: colors.surface,
+      borderColor: colors.borderStrong,
     },
-    pressed: { backgroundColor: colors.paperMuted },
-    label: { color: colors.ink },
+    pressed: { backgroundColor: colors.surfaceSunken },
+    label: { color: colors.textPrimary },
   },
   destructive: {
     container: { backgroundColor: 'transparent', borderColor: colors.danger },
-    pressed: { backgroundColor: colors.paperMuted },
+    pressed: { backgroundColor: colors.surfaceSunken },
     label: { color: colors.danger },
   },
 };

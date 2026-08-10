@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { Item, ItemType, Tag } from '../models';
+import { useBuiltInTypePreferences } from '../state/BuiltInTypePreferencesContext';
 import { useItems } from '../state/ItemsContext';
 import { colors, radii, spacing, typography } from '../theme';
 import { getCustomTypeColor, getItemTypeColor } from '../theme/itemTypeColors';
@@ -79,6 +80,7 @@ export default function ItemForm({
   onSubmit: ItemFormSubmit;
 }) {
   const { items } = useItems();
+  const { isTypeEnabled } = useBuiltInTypePreferences();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [type, setType] = useState<ItemType>(initialItem?.type ?? 'idea');
@@ -115,6 +117,14 @@ export default function ItemForm({
   const typeSearch = useMemo(
     () => searchItemTypes(typeQuery, items),
     [typeQuery, items]
+  );
+  // Disabled built-in types are hidden from the picker's selectable list —
+  // Manage Types hides them from *new* selection, it doesn't touch existing
+  // items, so the already-chosen `type` above still displays fine even if
+  // it's since been disabled.
+  const visibleBuiltIns = useMemo(
+    () => typeSearch.builtIns.filter((option) => isTypeEnabled(option.value)),
+    [typeSearch.builtIns, isTypeEnabled]
   );
   const trimmedTypeQuery = typeQuery.trim();
   const canCreateType = trimmedTypeQuery.length > 0 && !typeSearch.exactMatch;
@@ -209,7 +219,11 @@ export default function ItemForm({
         bottomOffset={24}
       >
         <FormField label="What are you saving?">
-          <Pressable style={styles.selector} onPress={openTypePicker}>
+          <Pressable
+            testID="type-picker-trigger"
+            style={styles.selector}
+            onPress={openTypePicker}
+          >
             <View style={styles.selectorPreview}>
               <TypePill
                 item={{ type, captureType: 'manual', customTypeLabel }}
@@ -232,7 +246,7 @@ export default function ItemForm({
             value={title}
             onChangeText={setTitle}
             placeholder="Name of the thing"
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
           />
         </FormField>
 
@@ -242,7 +256,7 @@ export default function ItemForm({
             value={content}
             onChangeText={setContent}
             placeholder={contentField.placeholder}
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
             multiline
             textAlignVertical="top"
           />
@@ -254,7 +268,7 @@ export default function ItemForm({
             value={category}
             onChangeText={setCategory}
             placeholder="e.g. product idea, travel, work"
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
           />
         </FormField>
 
@@ -264,7 +278,7 @@ export default function ItemForm({
             value={tagsInput}
             onChangeText={setTagsInput}
             placeholder="e.g. love, film, 2024"
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
             autoCapitalize="none"
           />
         </FormField>
@@ -275,7 +289,7 @@ export default function ItemForm({
             value={sourceNameInput}
             onChangeText={setSourceNameInput}
             placeholder="e.g. a person, a book, a podcast"
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
           />
         </FormField>
 
@@ -285,7 +299,7 @@ export default function ItemForm({
             value={sourceUrlInput}
             onChangeText={setSourceUrlInput}
             placeholder="https://…"
-            placeholderTextColor={colors.inkFaint}
+            placeholderTextColor={colors.textFaint}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
@@ -323,7 +337,7 @@ export default function ItemForm({
                 value={typeQuery}
                 onChangeText={setTypeQuery}
                 placeholder="Search or create a type"
-                placeholderTextColor={colors.inkFaint}
+                placeholderTextColor={colors.textFaint}
                 autoFocus
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -335,7 +349,7 @@ export default function ItemForm({
                 keyboardDismissMode="on-drag"
                 showsVerticalScrollIndicator={false}
               >
-                {typeSearch.builtIns.map((option) => {
+                {visibleBuiltIns.map((option) => {
                   const selected = type === option.value;
                   const { background } = getItemTypeColor(option.value);
                   return (
@@ -421,7 +435,7 @@ export default function ItemForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: spacing.xl,
@@ -435,18 +449,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   input: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairlineStrong,
+    borderColor: colors.borderStrong,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 15,
-    color: colors.ink,
+    color: colors.textPrimary,
   },
   inputDashed: {
     borderStyle: 'dashed',
-    borderColor: colors.inkFaint,
+    borderColor: colors.textFaint,
   },
   multilineInput: {
     minHeight: 110,
@@ -455,10 +469,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairlineStrong,
+    borderColor: colors.borderStrong,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
@@ -473,7 +487,7 @@ const styles = StyleSheet.create({
   },
   selectorChevron: {
     fontSize: 18,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
   },
   saveButton: {
     marginTop: spacing.sm,
@@ -481,7 +495,7 @@ const styles = StyleSheet.create({
   hint: {
     marginTop: spacing.md - 2,
     fontSize: 13,
-    color: colors.inkFaint,
+    color: colors.textFaint,
     textAlign: 'center',
   },
   modalOverlay: {
@@ -498,7 +512,7 @@ const styles = StyleSheet.create({
     maxHeight: '75%',
   },
   modalSheet: {
-    backgroundColor: colors.paper,
+    backgroundColor: colors.background,
     borderTopLeftRadius: radii.lg,
     borderTopRightRadius: radii.lg,
     paddingTop: spacing.lg,
@@ -510,14 +524,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   searchInput: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.hairlineStrong,
+    borderColor: colors.borderStrong,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 15,
-    color: colors.ink,
+    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   modalList: {
@@ -529,7 +543,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.md + 2,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.hairline,
+    borderBottomColor: colors.border,
   },
   modalRowLeft: {
     flexDirection: 'row',
@@ -543,19 +557,19 @@ const styles = StyleSheet.create({
   },
   modalRowText: {
     fontSize: 16,
-    color: colors.ink,
+    color: colors.textPrimary,
   },
   modalRowTextSelected: {
     fontWeight: '700',
   },
   modalRowCheck: {
     fontSize: 15,
-    color: colors.tomato,
+    color: colors.accent,
     fontWeight: '700',
   },
   modalCreateText: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.tomato,
+    color: colors.accent,
   },
 });

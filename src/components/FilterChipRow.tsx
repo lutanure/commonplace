@@ -24,7 +24,7 @@ interface ChipColors {
 // here as it does on its cards and detail page.
 function getChipColors(filter: TypeFilter | null): ChipColors {
   if (!filter) {
-    return { background: colors.ink, text: colors.cream };
+    return { background: colors.textPrimary, text: colors.cream };
   }
   if (filter.kind === 'builtin') {
     return getItemTypeColor(filter.value);
@@ -126,10 +126,10 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xs,
   },
   chip: {
-    backgroundColor: colors.paperElevated,
+    backgroundColor: colors.surface,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm - 2,
   },
@@ -138,6 +138,6 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.label,
-    color: colors.inkMuted,
+    color: colors.textSecondary,
   },
 });
