@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import type { Item } from '../models';
 import { useBuiltInTypePreferences } from '../state/BuiltInTypePreferencesContext';
 import { useItems } from '../state/ItemsContext';
 import ItemForm from './ItemForm';
@@ -139,5 +140,70 @@ describe('ItemForm type picker — disabled built-in types', () => {
 
     expect(screen.getByText('Article')).toBeTruthy();
     expect(screen.getByText('Book')).toBeTruthy();
+  });
+});
+
+describe('ItemForm initialType (Petal Quick Add preset)', () => {
+  it('seeds the selector with a built-in preset type', () => {
+    render(
+      <ItemForm
+        onSubmit={jest.fn()}
+        initialType={{ kind: 'builtin', value: 'book' }}
+      />
+    );
+
+    expect(screen.getAllByText('Book').length).toBeGreaterThan(0);
+  });
+
+  it('seeds the selector with a custom preset type and submits it as type "other"', async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+    render(
+      <ItemForm
+        onSubmit={onSubmit}
+        initialType={{ kind: 'custom', label: 'Research Paper' }}
+      />
+    );
+
+    expect(screen.getAllByText('Research Paper').length).toBeGreaterThan(0);
+
+    fillValidForm();
+    await act(async () => {
+      fireEvent.press(screen.getByText('Save to Library'));
+    });
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'other',
+        customTypeLabel: 'Research Paper',
+      })
+    );
+  });
+
+  it('defaults to Idea when no initialItem or initialType is given', () => {
+    render(<ItemForm onSubmit={jest.fn()} />);
+    expect(screen.getAllByText('Idea').length).toBeGreaterThan(0);
+  });
+
+  it('lets initialItem take priority over initialType when both are given', () => {
+    const initialItem: Item = {
+      id: 'item-1',
+      title: 'Dune',
+      type: 'movie',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      captureType: 'manual',
+      tags: [],
+      isPinned: false,
+    };
+    render(
+      <ItemForm
+        onSubmit={jest.fn()}
+        initialItem={initialItem}
+        initialType={{ kind: 'builtin', value: 'book' }}
+      />
+    );
+
+    expect(screen.getAllByText('Movie').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Book')).toBeNull();
   });
 });

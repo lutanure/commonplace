@@ -8,8 +8,9 @@ import { colors } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddItem'>;
 
-export default function AddItemScreen({ navigation }: Props) {
+export default function AddItemScreen({ navigation, route }: Props) {
   const { addItem } = useItems();
+  const presetType = route.params?.presetType;
 
   async function handleSubmit(result: ItemFormResult) {
     try {
@@ -38,7 +39,7 @@ export default function AddItemScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <BackControl label="Library" onPress={() => navigation.goBack()} />
-      <ItemForm onSubmit={handleSubmit} />
+      <ItemForm onSubmit={handleSubmit} initialType={presetType} />
     </SafeAreaView>
   );
 }

@@ -20,7 +20,11 @@ import { colors, radii, spacing, typography } from '../theme';
 import { getCustomTypeColor, getItemTypeColor } from '../theme/itemTypeColors';
 import { getItemTypeLabel } from '../utils/itemTypeLabel';
 import { parseTagsInput } from '../utils/tags';
-import { normalizeTypeKey, searchItemTypes } from '../utils/typeTaxonomy';
+import {
+  normalizeTypeKey,
+  searchItemTypes,
+  type TypeFilter,
+} from '../utils/typeTaxonomy';
 import { normalizeUrl } from '../utils/url';
 import Button from './Button';
 import TypePill from './TypePill';
@@ -57,6 +61,28 @@ export interface ItemFormResult {
 
 export type ItemFormSubmit = (result: ItemFormResult) => Promise<void>;
 
+// `initialItem` (Edit) always wins over `initialType` (a Petal Quick Add /
+// Add preset) — the two are never meant to be passed together in practice,
+// but this keeps the precedence unambiguous if they ever are.
+function resolveInitialType(
+  initialItem: Item | undefined,
+  initialType: TypeFilter | undefined
+): { type: ItemType; customTypeLabel: string } {
+  if (initialItem) {
+    return {
+      type: initialItem.type,
+      customTypeLabel: initialItem.customTypeLabel ?? '',
+    };
+  }
+  if (initialType?.kind === 'builtin') {
+    return { type: initialType.value, customTypeLabel: '' };
+  }
+  if (initialType?.kind === 'custom') {
+    return { type: 'other', customTypeLabel: initialType.label };
+  }
+  return { type: 'idea', customTypeLabel: '' };
+}
+
 function FormField({
   label,
   children,
@@ -74,18 +100,22 @@ function FormField({
 
 export default function ItemForm({
   initialItem,
+  initialType,
   onSubmit,
 }: {
   initialItem?: Item;
+  initialType?: TypeFilter;
   onSubmit: ItemFormSubmit;
 }) {
   const { items } = useItems();
   const { isTypeEnabled } = useBuiltInTypePreferences();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [type, setType] = useState<ItemType>(initialItem?.type ?? 'idea');
+  const [type, setType] = useState<ItemType>(
+    () => resolveInitialType(initialItem, initialType).type
+  );
   const [customTypeLabel, setCustomTypeLabel] = useState(
-    initialItem?.customTypeLabel ?? ''
+    () => resolveInitialType(initialItem, initialType).customTypeLabel
   );
   const [typePickerVisible, setTypePickerVisible] = useState(false);
   const [typeQuery, setTypeQuery] = useState('');

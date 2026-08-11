@@ -1,13 +1,18 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { Item } from '../models';
 import { useItems } from '../state/ItemsContext';
+import { useQuickAddPreferences } from '../state/QuickAddPreferencesContext';
 import HomeScreen from './HomeScreen';
 
 jest.mock('../state/ItemsContext', () => ({
   useItems: jest.fn(),
 }));
+jest.mock('../state/QuickAddPreferencesContext', () => ({
+  useQuickAddPreferences: jest.fn(),
+}));
 
 const mockedUseItems = useItems as jest.Mock;
+const mockedUseQuickAddPreferences = useQuickAddPreferences as jest.Mock;
 
 function makeItem(overrides: Partial<Item> = {}): Item {
   return {
@@ -48,9 +53,31 @@ function mockItemsState(overrides: Partial<ReturnType<typeof useItems>> = {}) {
 
 beforeEach(() => {
   mockedUseItems.mockReset();
+
+  mockedUseQuickAddPreferences.mockReset();
+  mockedUseQuickAddPreferences.mockReturnValue({
+    options: [
+      { kind: 'builtin', value: 'idea' },
+      { kind: 'builtin', value: 'note' },
+      { kind: 'builtin', value: 'book' },
+    ],
+    isLoading: false,
+    setOptions: jest.fn(),
+  });
 });
 
 describe('HomeScreen', () => {
+  it('renders the Petal Quick Add FAB with one petal per quick-add option', () => {
+    mockItemsState({ items: [] });
+    renderHomeScreen();
+
+    expect(screen.getByTestId('petal-fab')).toBeTruthy();
+    expect(screen.getByLabelText('Add Idea')).toBeTruthy();
+    expect(screen.getByLabelText('Add Note')).toBeTruthy();
+    expect(screen.getByLabelText('Add Book')).toBeTruthy();
+    expect(screen.getByLabelText('All types')).toBeTruthy();
+  });
+
   it('shows a loading indicator while items are loading', () => {
     mockItemsState({ isLoading: true, items: [] });
     renderHomeScreen();

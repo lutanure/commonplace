@@ -1,4 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,11 +13,13 @@ import {
 import Button from '../components/Button';
 import FilterChipRow from '../components/FilterChipRow';
 import ItemCard from '../components/ItemCard';
+import PetalQuickAdd from '../components/PetalQuickAdd';
 import SettingsIcon from '../components/SettingsIcon';
 import type { RootStackParamList } from '../navigation/types';
 import { useItems } from '../state/ItemsContext';
 import { useLibrarySearch } from '../state/useLibrarySearch';
 import { colors, radii, spacing, typography } from '../theme';
+import type { TypeFilter } from '../utils/typeTaxonomy';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Library'>;
 
@@ -33,6 +36,11 @@ export default function HomeScreen({ navigation }: Props) {
     isLibraryCapped,
     clearFilters,
   } = useLibrarySearch(items);
+  const [bloomOpen, setBloomOpen] = useState(false);
+
+  function handlePetalSelect(presetType?: TypeFilter) {
+    navigation.navigate('AddItem', presetType ? { presetType } : undefined);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,6 +48,8 @@ export default function HomeScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        importantForAccessibility={bloomOpen ? 'no-hide-descendants' : 'yes'}
+        accessibilityElementsHidden={bloomOpen}
       >
         <View style={styles.header}>
           <Text style={styles.logoLine}>
@@ -61,33 +71,26 @@ export default function HomeScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
-        <View style={styles.searchRow}>
-          <View style={styles.searchInputWrap}>
-            <TextInput
-              style={styles.searchBar}
-              placeholder="Search your memory"
-              placeholderTextColor={colors.textFaint}
-              value={query}
-              onChangeText={setQuery}
-              autoCorrect={false}
-              clearButtonMode="never"
-            />
-            {query.length > 0 ? (
-              <Pressable
-                accessibilityLabel="Clear search"
-                onPress={() => setQuery('')}
-                style={styles.clearButton}
-                hitSlop={8}
-              >
-                <Text style={styles.clearButtonText}>×</Text>
-              </Pressable>
-            ) : null}
-          </View>
-          <Button
-            label="+ Add"
-            onPress={() => navigation.navigate('AddItem')}
-            style={styles.addButton}
+        <View style={styles.searchInputWrap}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search your memory"
+            placeholderTextColor={colors.textFaint}
+            value={query}
+            onChangeText={setQuery}
+            autoCorrect={false}
+            clearButtonMode="never"
           />
+          {query.length > 0 ? (
+            <Pressable
+              accessibilityLabel="Clear search"
+              onPress={() => setQuery('')}
+              style={styles.clearButton}
+              hitSlop={8}
+            >
+              <Text style={styles.clearButtonText}>×</Text>
+            </Pressable>
+          ) : null}
         </View>
 
         {!isLoading && !error && availableTypeFilters.length > 0 ? (
@@ -168,6 +171,11 @@ export default function HomeScreen({ navigation }: Props) {
           )}
         </View>
       </ScrollView>
+      <PetalQuickAdd
+        isOpen={bloomOpen}
+        onOpenChange={setBloomOpen}
+        onSelect={handlePetalSelect}
+      />
     </SafeAreaView>
   );
 }
@@ -179,7 +187,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxl,
+    // Extra bottom padding so list content (and the "✦ End ✦" divider)
+    // clears the resting Petal Quick Add FAB (bottom:40 + diameter:56).
+    paddingBottom: 136,
   },
   header: {
     flexDirection: 'row',
@@ -214,15 +224,9 @@ const styles = StyleSheet.create({
   logoDot: {
     color: colors.accent,
   },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
   searchInputWrap: {
-    flex: 1,
     justifyContent: 'center',
+    marginBottom: spacing.lg,
   },
   searchBar: {
     backgroundColor: colors.surface,
@@ -249,10 +253,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 16,
     color: colors.textSecondary,
-  },
-  addButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
   },
   section: {
     marginTop: spacing.sm,
