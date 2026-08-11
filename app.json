@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "commonplace",
+    "name": "Commonplace",
     "slug": "commonplace",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/commonplace-icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luisatanure.commonplace"
     },
     "android": {
       "adaptiveIcon": {

@@ -49,9 +49,9 @@ fast with silent scope creep.
    through it. Strong success criteria mean you can loop and self-check; weak ones ("make it
    work") just generate more back-and-forth.
 
-*(Adapted from Andrej Karpathy's public notes on common LLM coding failure modes, via
+_(Adapted from Andrej Karpathy's public notes on common LLM coding failure modes, via
 [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills), MIT
-licensed.)*
+licensed.)_
 
 ## Commands
 
@@ -130,7 +130,7 @@ See `data-model.md` for the full `Item`/`Tag` domain model and rationale, and
 
 ## Stack
 
-- React Native + Expo SDK 57, TypeScript
+- React Native + Expo SDK 54, TypeScript
 - Node.js 20.19.4 (`.nvmrc` checked in)
 - React Context for state (`ItemsContext`)
 - Expo Google Fonts (Bowlby One + Instrument Sans)
