@@ -21,6 +21,38 @@ up, unless the user says otherwise.
 The app currently has a full `src/` structure (see Architecture below) with working Supabase
 persistence, anonymous auth, and a relational tag system. Search is not yet implemented.
 
+## Agent behavior principles
+
+Four rules that govern how you work in this repo, not just what you build. When they conflict
+with speed, they win — this project would rather move a little slower with fewer regressions than
+fast with silent scope creep.
+
+1. **Think before coding.** Don't silently pick an interpretation when the request is ambiguous —
+   state your assumption out loud, or ask. If a simpler approach exists than the one implied by
+   the request, say so before building the complicated one. If something's unclear, name what's
+   unclear and stop rather than guessing your way through it.
+
+2. **Simplicity first.** Build the minimum that solves the stated problem — nothing speculative,
+   no "flexibility" or config options nobody asked for, no error handling for scenarios that can't
+   happen here. If 200 lines could be 50, write the 50. Ask: would a senior engineer call this
+   overcomplicated? If yes, cut it down.
+
+3. **Surgical changes.** Touch only what the task requires. Don't refactor, restyle, or "clean up"
+   adjacent code while you're in there, even if it's tempting — match the existing style even when
+   you'd personally do it differently. If your own change makes an import or variable unused,
+   remove it; if you notice unrelated dead code, mention it instead of deleting it. Every changed
+   line should trace back to what was actually asked.
+
+4. **Goal-driven execution.** Turn vague instructions into verifiable success criteria before
+   starting. "Fix the bug" becomes "write a test that reproduces it, then make it pass." For
+   multi-step work, state a short plan with a verification step attached to each part, then work
+   through it. Strong success criteria mean you can loop and self-check; weak ones ("make it
+   work") just generate more back-and-forth.
+
+*(Adapted from Andrej Karpathy's public notes on common LLM coding failure modes, via
+[multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills), MIT
+licensed.)*
+
 ## Commands
 
 ```bash

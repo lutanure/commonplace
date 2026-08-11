@@ -14,9 +14,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import BrandMark from './src/components/BrandMark';
 import type { RootStackParamList } from './src/navigation/types';
 import AddItemScreen from './src/screens/AddItemScreen';
 import CustomizeQuickAddScreen from './src/screens/CustomizeQuickAddScreen';
@@ -64,7 +65,7 @@ function AppShell() {
   if (!fontsReady || isAuthLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={colors.textPrimary} />
+        <BrandMark size={48} />
       </View>
     );
   }

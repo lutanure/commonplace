@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-11T00:00:00Z",
+  "title": "Design System: Commonplace",
+  "extensions": {
+    "colorMeta": {
+      "bound-plum": { "role": "secondary", "displayName": "Bound Plum", "canonical": "oklch(33.1% 0.052 5.1)", "tonalRamp": ["#1b0208", "#3e1d25", "#623e46", "#89626a", "#af858e", "#d2a7b0", "#f3c7cf", "#ffe1ea"] },
+      "bound-plum-deep": { "role": "secondary", "displayName": "Bound Plum, Deep", "canonical": "oklch(26.9% 0.039 3.8)", "tonalRamp": ["#180409", "#392127", "#5d4248", "#83666c", "#a8898f", "#cbabb1", "#eccad1", "#ffe4eb"] },
+      "sealing-wax-rust": { "role": "primary", "displayName": "Sealing-Wax Rust", "canonical": "oklch(54.8% 0.176 33.6)", "tonalRamp": ["#3a0000", "#660000", "#920000", "#bf381b", "#ea6043", "#ff8465", "#ffa585", "#ffbf9e"] },
+      "sealing-wax-rust-deep": { "role": "primary", "displayName": "Sealing-Wax Rust, Deep", "canonical": "oklch(47.1% 0.151 33.7)", "tonalRamp": ["#340000", "#5f0000", "#891900", "#b5452d", "#df6b51", "#ff8d72", "#ffad91", "#ffc8ab"] },
+      "aged-gold-ochre": { "role": "primary", "displayName": "Aged-Gold Ochre", "canonical": "oklch(67.8% 0.127 73.4)", "tonalRamp": ["#260000", "#4b1600", "#723b00", "#9a6000", "#c08527", "#e5a74f", "#ffc770", "#ffe18b"] },
+      "warm-vellum": { "role": "neutral", "displayName": "Warm Vellum", "canonical": "oklch(95.9% 0.021 88.7)", "tonalRamp": ["#0f0b03", "#2d281d", "#4f4a3e", "#746e61", "#979284", "#bab4a6", "#dad4c5", "#f4eedf"] },
+      "warm-vellum-sunken": { "role": "neutral", "displayName": "Warm Vellum, Sunken", "canonical": "oklch(93.2% 0.028 88.8)", "tonalRamp": ["#100a01", "#2e2819", "#504a39", "#756e5c", "#99927f", "#bbb4a1", "#dcd4c0", "#f6eeda"] },
+      "bright-vellum": { "role": "neutral", "displayName": "Bright Vellum", "canonical": "oklch(99.4% 0.007 88.6)", "tonalRamp": ["#0c0b08", "#2a2925", "#4c4a46", "#706e6a", "#94928d", "#b6b4af", "#d6d4cf", "#f0eee9"] },
+      "deep-ink": { "role": "neutral", "displayName": "Deep Ink", "canonical": "oklch(25.6% 0.018 55.5)", "tonalRamp": ["#110905", "#302721", "#524841", "#776c65", "#9b9088", "#beb2aa", "#ded1c9", "#f8ece3"] },
+      "faded-ink": { "role": "neutral", "displayName": "Faded Ink", "canonical": "oklch(43.5% 0.022 64.5)", "tonalRamp": ["#120903", "#31271e", "#53483e", "#786c62", "#9c9085", "#beb2a6", "#dfd2c6", "#f9ece0"] },
+      "ghost-ink": { "role": "neutral", "displayName": "Ghost Ink", "canonical": "oklch(60.0% 0.034 76.8)", "tonalRamp": ["#130900", "#322715", "#554836", "#7a6c59", "#9e907b", "#c1b29d", "#e1d2bc", "#fcecd6"] },
+      "parchment-border": { "role": "neutral", "displayName": "Parchment Border", "canonical": "oklch(86.0% 0.025 83.4)", "tonalRamp": ["#100a02", "#2f281b", "#51493b", "#766e5e", "#9a9181", "#bcb3a3", "#dcd3c2", "#f7eddc"] },
+      "parchment-border-deep": { "role": "neutral", "displayName": "Parchment Border, Deep", "canonical": "oklch(78.6% 0.039 79.0)", "tonalRamp": ["#140900", "#332711", "#564832", "#7b6c55", "#9f9078", "#c2b299", "#e2d2b8", "#fdecd2"] },
+      "moss-olive": { "role": "tertiary", "displayName": "Moss Olive", "canonical": "oklch(58.3% 0.076 92.4)", "tonalRamp": ["#160700", "#362700", "#59490f", "#7e6d37", "#a3915b", "#c5b37c", "#e6d49b", "#ffeeb4"] },
+      "type-tomato": { "role": "type-coding", "displayName": "Type Coding — Tomato (Movie / TV Show)", "canonical": "oklch(56.2% 0.155 35.2)", "tonalRamp": ["#350000", "#600000", "#8b1700", "#b74427", "#e06a4c", "#ff8d6e", "#ffad8d", "#ffc7a6"] },
+      "type-olive": { "role": "type-coding", "displayName": "Type Coding — Olive (Book / Quote)", "canonical": "oklch(47.9% 0.063 122.1)", "tonalRamp": ["#070e00", "#242d04", "#445027", "#68754b", "#8b996d", "#adbb8f", "#cddbae", "#e7f6c7"] },
+      "type-teal": { "role": "type-coding", "displayName": "Type Coding — Teal (Place / Recipe)", "canonical": "oklch(48.2% 0.047 187.9)", "tonalRamp": ["#00110f", "#03302d", "#2a534f", "#4e7874", "#719c97", "#93beba", "#b2dfda", "#ccf9f4"] },
+      "type-plum-muted": { "role": "type-coding", "displayName": "Type Coding — Muted Plum (Song / Podcast)", "canonical": "oklch(41.9% 0.074 350.6)", "tonalRamp": ["#1f000f", "#43172e", "#683950", "#905d74", "#b68098", "#daa1ba", "#fbc1da", "#ffdbf5"] },
+      "type-navy": { "role": "type-coding", "displayName": "Type Coding — Navy (Article / Product / Image)", "canonical": "oklch(26.3% 0.019 276.2)", "tonalRamp": ["#090a13", "#262832", "#474a55", "#6b6e7a", "#8f919e", "#b1b3c1", "#d0d3e1", "#ebeefc"] },
+      "type-clay": { "role": "type-coding", "displayName": "Type Coding — Clay (Other / unclassified)", "canonical": "oklch(59.1% 0.046 85.8)", "tonalRamp": ["#140900", "#33270a", "#56492c", "#7b6d50", "#9f9172", "#c2b393", "#e2d3b2", "#fdedcc"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The \"Commonplace\" wordmark only — never a heading or user content." },
+      "headline": { "displayName": "Headline", "purpose": "Page-level titles (Settings, Manage Types)." },
+      "title": { "displayName": "Title", "purpose": "Item card titles." },
+      "titleSmall": { "displayName": "Title, Small", "purpose": "Modal titles, selected-type preview." },
+      "body": { "displayName": "Body", "purpose": "Default paragraph/body text." },
+      "bodyMuted": { "displayName": "Body, Muted", "purpose": "Secondary descriptive text (settings row descriptions)." },
+      "label": { "displayName": "Label", "purpose": "Section headers, chip/badge text, form field labels." },
+      "caption": { "displayName": "Caption", "purpose": "Dates, metadata — the least prominent text on a screen." },
+      "button": { "displayName": "Button", "purpose": "All button and pill-button labels." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "petal-open", "value": "220ms cubic-bezier(0.215, 0.61, 0.355, 1)", "purpose": "Petal Quick Add bloom-open, per-petal staggered by 8% of total progress." },
+      { "name": "petal-close", "value": "160ms cubic-bezier(0.55, 0.055, 0.675, 0.19)", "purpose": "Petal Quick Add collapse, faster than the open." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled, high-emphasis action on a screen (e.g. \"Save to Library\").",
+      "html": "<button class=\"ds-btn-primary\">Save to Library</button>",
+      "css": ".ds-btn-primary { background: #C23B1E; color: #FFFDF8; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 15px; border: 1px solid #C23B1E; border-radius: 10px; padding: 14px 24px; cursor: pointer; transition: background 0.15s, border-color 0.15s; } .ds-btn-primary:hover { background: #9E2F17; border-color: #9E2F17; } .ds-btn-primary:focus-visible { outline: 2px solid #9E2F17; outline-offset: 2px; } .ds-btn-primary:active { background: #9E2F17; border-color: #9E2F17; }"
+    },
+    {
+      "name": "Neutral Button",
+      "kind": "button",
+      "refersTo": "button-neutral",
+      "description": "A secondary, lower-emphasis action (e.g. \"Retry\", \"Clear filters\").",
+      "html": "<button class=\"ds-btn-neutral\">Clear filters</button>",
+      "css": ".ds-btn-neutral { background: #FFFDF8; color: #2A211B; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 15px; border: 1px solid #C7B79E; border-radius: 10px; padding: 14px 24px; cursor: pointer; transition: background 0.15s; } .ds-btn-neutral:hover, .ds-btn-neutral:active { background: #F0E8D4; } .ds-btn-neutral:focus-visible { outline: 2px solid #9E2F17; outline-offset: 2px; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip-active",
+      "description": "Library type filters — inactive chips stay neutral, the active chip fills with rust (or a type's own coding color).",
+      "html": "<div class=\"ds-chip-row\"><button class=\"ds-chip\">Books</button><button class=\"ds-chip ds-chip--active\">All</button></div>",
+      "css": ".ds-chip-row { display: flex; gap: 8px; } .ds-chip { background: #FFFDF8; color: #5A4F45; border: 1px solid #D9D0BF; border-radius: 999px; padding: 6px 12px; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; } .ds-chip--active { background: #C23B1E; color: #FFFDF8; border-color: #C23B1E; } .ds-chip:hover { opacity: 0.85; } .ds-chip:focus-visible { outline: 2px solid #9E2F17; outline-offset: 2px; }"
+    },
+    {
+      "name": "Item Type Badge",
+      "kind": "chip",
+      "description": "The always-on-color badge marking an item's semantic type, from the separately-maintained type-coding palette.",
+      "html": "<span class=\"ds-badge ds-badge--dark\" style=\"background:#BE4B2E\">Movie</span> <span class=\"ds-badge ds-badge--light\" style=\"background:#C68A2E\">Idea</span>",
+      "css": ".ds-badge { display: inline-block; border-radius: 999px; padding: 5px 12px; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; } .ds-badge--dark { color: #FFFDF8; } .ds-badge--light { color: #22242E; }"
+    },
+    {
+      "name": "Item Card",
+      "kind": "card",
+      "refersTo": "card-item",
+      "description": "The core content unit of the Library list — the one surface allowed the ochre accent border.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-header\"><span class=\"ds-badge ds-badge--dark\" style=\"background:#BE4B2E\">Movie</span><span class=\"ds-card-date\">Aug 9</span></div><h3 class=\"ds-card-title\">Everything Everywhere All at Once</h3><p class=\"ds-card-snippet\">A wildly inventive multiverse story about a laundromat owner who must connect with parallel versions of herself.</p></article>",
+      "css": ".ds-card { background: #F7F1E2; border: 1px solid #C68A2E; border-radius: 6px; padding: 16px; font-family: 'Instrument Sans', system-ui, sans-serif; transition: background 0.15s; } .ds-card:hover { background: #FFFDF8; } .ds-card-header { display: flex; align-items: center; justify-content: space-between; } .ds-card-date { font-size: 12px; letter-spacing: 0.4px; color: #8C7E6A; } .ds-card-title { font-weight: 700; font-size: 17px; line-height: 22px; letter-spacing: -0.2px; color: #2A211B; margin: 8px 0 0; } .ds-card-snippet { font-size: 14px; line-height: 20px; color: #5A4F45; margin: 6px 0 0; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Solid border for required fields; dashed border marks an optional/freeform field.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Title *</span><input class=\"ds-input\" type=\"text\" placeholder=\"Name of the thing\" /></label><label class=\"ds-field\"><span class=\"ds-field-label\">Tags</span><input class=\"ds-input ds-input--optional\" type=\"text\" placeholder=\"e.g. love, film, 2024\" /></label>",
+      "css": ".ds-field { display: block; margin-bottom: 16px; } .ds-field-label { display: block; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: #5A4F45; margin-bottom: 8px; } .ds-input { box-sizing: border-box; width: 100%; background: #FFFDF8; border: 1px solid #C7B79E; border-radius: 6px; padding: 12px 16px; font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 15px; color: #2A211B; } .ds-input::placeholder { color: #8C7E6A; } .ds-input:focus-visible { outline: 2px solid #C23B1E; outline-offset: 1px; } .ds-input--optional { border-style: dashed; border-color: #8C7E6A; }"
+    },
+    {
+      "name": "Back Control",
+      "kind": "nav",
+      "description": "The single back-navigation pattern used on every push screen — text, not a system arrow icon.",
+      "html": "<button class=\"ds-back\">‹ Library</button>",
+      "css": ".ds-back { background: none; border: none; padding: 16px 24px 8px; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 15px; color: #C23B1E; cursor: pointer; } .ds-back:hover { opacity: 0.6; } .ds-back:focus-visible { outline: 2px solid #9E2F17; outline-offset: 2px; }"
+    },
+    {
+      "name": "Petal Quick Add",
+      "kind": "custom",
+      "refersTo": "fab-quick-add",
+      "description": "Signature bottom-right FAB that blooms into per-type pill shortcuts along an asymmetric polar fan.",
+      "html": "<div class=\"ds-fab-demo\"><button class=\"ds-petal\" style=\"background:#BE4B2E;color:#FFFDF8\">Movie</button><button class=\"ds-petal ds-petal--neutral\">All types</button><button class=\"ds-fab\" aria-label=\"Add\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 18 18\"><path d=\"M9 0v18M0 9h18\" stroke=\"#FFFDF8\" stroke-width=\"2.5\" stroke-linecap=\"round\"/></svg></button></div>",
+      "css": ".ds-fab-demo { display: flex; align-items: center; gap: 12px; } .ds-fab { width: 56px; height: 56px; border-radius: 999px; background: #C23B1E; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; } .ds-fab:hover { background: #9E2F17; } .ds-fab:focus-visible { outline: 2px solid #9E2F17; outline-offset: 2px; } .ds-petal { height: 44px; padding: 0 16px; border-radius: 999px; border: none; font-family: 'Instrument Sans', system-ui, sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; } .ds-petal--neutral { background: #FFFDF8; color: #2A211B; border: 1.5px solid #C7B79E; }"
+    },
+    {
+      "name": "Brand Lockup",
+      "kind": "custom",
+      "description": "Mark + wordmark used in the Library header and the app's loading screen. The closing dot is a graphic circle, never a typed character.",
+      "html": "<div class=\"ds-lockup\"><svg class=\"ds-lockup-mark\" width=\"26\" height=\"26\" viewBox=\"0 0 512 512\"><path d=\"M 343.5,104.45 L 256,256 L 430.3,240.7\" stroke=\"#A34B32\" stroke-width=\"90\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M 343.5,407.55 L 256,256 L 182.04,414.6\" stroke=\"#331920\" stroke-width=\"90\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/><path d=\"M 81,256 L 256,256 L 155.6,112.6\" stroke=\"#C99A3D\" stroke-width=\"90\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/></svg><span class=\"ds-lockup-word\">Common<span class=\"ds-lockup-place\">place</span></span><span class=\"ds-lockup-dot\"></span></div>",
+      "css": ".ds-lockup { display: flex; align-items: center; } .ds-lockup-mark { margin-right: 6px; } .ds-lockup-word { font-family: 'Bowlby One', Georgia, serif; font-size: 28px; letter-spacing: -0.5px; line-height: 34px; color: #4C2A32; } .ds-lockup-place { color: #C23B1E; } .ds-lockup-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #C68A2E; margin-left: 4px; align-self: flex-end; margin-bottom: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Commonplace Book",
+    "overview": "Commonplace is named for, and looks like, the historic practice it digitizes: the personal notebook readers have kept for centuries to copy down quotes, recipes, observations, and things worth remembering. The visual system reads as a well-kept bound book, not a productivity app — warm vellum paper, deep ink, and accents that recall sealing wax and gilt page-edges, rather than screen-native blues and grays. Every surface is flat and matte; nothing glows, floats, or animates for its own sake. Structure comes from a thin warm-neutral rule (a hairline border) the way a real page has a printed margin, not from drop shadows.\n\nThe system is considered and unhurried: flat, generously rounded, and visually calm. Paper and cream surfaces dominate; thin warm borders create structure; ochre is used selectively to give specific important surfaces character (the item card border, the wordmark's closing dot) rather than being spread everywhere. Sealing-wax rust is reserved for the one primary action or active state per screen — its rarity is what makes it legible as \"the thing to do here.\" Nothing in the system is glossy, gradient-filled, or \"tech-modern\"; the target is the opposite of a SaaS dashboard.",
+    "keyCharacteristics": [
+      "Warm paper background, never stark white",
+      "Bowlby One reserved exclusively for the \"Commonplace\" wordmark — every other heading is bold Instrument Sans",
+      "Flat everywhere — zero shadows in the entire system; depth comes from background-color steps and hairline borders",
+      "One rust accent per screen for the primary action; ochre used sparingly as a considered accent, not a second primary",
+      "Generously rounded corners and pill-shaped chips/badges/buttons-as-tags",
+      "Item type is always color-coded through a closed, separately-maintained palette — never improvised per screen"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Sealing-Wax Rust appears at most once per screen as a fill — the single primary action or the single active/selected state. Everywhere else, action is expressed as rust text (links, destructive labels) or the surface simply stays neutral.", "section": "colors" },
+      { "name": "The Two Palettes Rule", "body": "The chrome palette and the Item Type Coding palette are maintained as two independent systems on purpose. A restyle of the app's chrome must never silently change what color a \"movie\" or \"book\" badge renders as, and vice versa.", "section": "colors" },
+      { "name": "The Ochre Card Rule", "body": "Item cards alone carry a solid Aged-Gold Ochre border instead of the neutral Parchment Border every other bordered surface uses — a deliberate accent marking the library's core content unit as visually distinct from its chrome.", "section": "colors" },
+      { "name": "The One Display Face Rule", "body": "Bowlby One renders in exactly one place in the entire app: the brand wordmark. Every heading, however large or bold, stays on Instrument Sans.", "section": "typography" },
+      { "name": "The No-Shadow Rule", "body": "Never add shadow/elevation styling. If a surface needs to read as \"raised,\" step its background one shade brighter and/or add a hairline border — never a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Keep Sealing-Wax Rust to at most one filled instance per screen — the primary action or the active state (The One Accent Rule).",
+      "Route every color through the colors / typeColors theme tokens. The codebase currently has zero hardcoded hex values inside any screen or component — keep it that way.",
+      "Use Bowlby One only for the literal \"Commonplace\" wordmark (The One Display Face Rule).",
+      "Keep chrome colors (colors.ts) and item-type-coding colors (typeColors.ts) as two independent systems (The Two Palettes Rule) — never derive one from the other.",
+      "Use light (Bright Vellum) text on dark type-coding badges and dark text on the one light (ochre) badge, matching the existing getItemDisplayColor contrast pairing.",
+      "Use a dashed border to mark an input field as optional/freeform, solid for required fields."
+    ],
+    "donts": [
+      "Don't add drop shadows, glows, gradients, glassmorphism, or any other \"modern tech\" surface treatment — the system is flat and matte everywhere (The No-Shadow Rule).",
+      "Don't introduce a second display/brand typeface. Instrument Sans (in its four weights) carries every heading and UI role outside the wordmark.",
+      "Don't give the ochre accent border to any bordered surface other than item cards — chips, inputs, settings groups, and modals all keep the neutral Parchment Border (The Ochre Card Rule).",
+      "Don't scatter the brand mark decoratively across ordinary UI. It belongs only in the Library header lockup and loading/splash moments.",
+      "Don't design UI for AI-derived fields (summaries, extracted entities, confidence scores) as if they're live — that surface is reserved but currently inert."
+    ]
+  }
+}

@@ -15,7 +15,7 @@ import { fontFamily } from './fonts';
 export const typography = {
   displayXL: {
     fontFamily: fontFamily.display,
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '400' as const,
     color: colors.textPrimary,
     letterSpacing: -0.5,

@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import BrandLockup from '../components/BrandLockup';
 import Button from '../components/Button';
 import FilterChipRow from '../components/FilterChipRow';
 import ItemCard from '../components/ItemCard';
@@ -52,11 +53,7 @@ export default function HomeScreen({ navigation }: Props) {
         accessibilityElementsHidden={bloomOpen}
       >
         <View style={styles.header}>
-          <Text style={styles.logoLine}>
-            Common
-            <Text style={styles.logoAccentLine}>place</Text>
-            <Text style={styles.logoDot}> ●</Text>
-          </Text>
+          <BrandLockup />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Settings"
@@ -210,19 +207,6 @@ const styles = StyleSheet.create({
   },
   settingsButtonPressed: {
     backgroundColor: colors.surfaceSunken,
-  },
-  logoLine: {
-    ...typography.displayXL,
-    lineHeight: 38,
-  },
-  // Plum carries the app's strongest brand identity; the dot gets a small
-  // pop of the rust action accent — together the wordmark's one deliberate
-  // Bowlby One + full core-palette moment in the app.
-  logoAccentLine: {
-    color: colors.primary,
-  },
-  logoDot: {
-    color: colors.accent,
   },
   searchInputWrap: {
     justifyContent: 'center',

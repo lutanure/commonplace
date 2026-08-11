@@ -9,6 +9,7 @@
 // Brand
 const plum = '#4C2A32';
 const plumStrong = '#361E24';
+const ochre = '#C68A2E';
 
 // Feature / action accent
 const rust = '#C23B1E';
@@ -41,6 +42,7 @@ export const colors = {
   // Raw palette (prefer the semantic tokens below in components)
   plum,
   plumStrong,
+  ochre,
   rust,
   rustStrong,
   paper,
@@ -68,6 +70,11 @@ export const colors = {
   primaryPressed: plumStrong,
   accent: rust,
   accentPressed: rustStrong,
+  // Brand-lockup-specific aliases (wordmark, brand mark) — same values as
+  // `primary`/`accent`/`ochre` above, named to match the identity spec.
+  brandPlum: plum,
+  brandOrange: rust,
+  brandOchre: ochre,
   // No separate error hue in the finalized palette — rust already reads as
   // an alarm color, so destructive actions reuse the accent tokens.
   danger: rust,

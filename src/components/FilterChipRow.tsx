@@ -18,13 +18,13 @@ interface ChipColors {
   text: string;
 }
 
-// "All" reads as ink/cream (the app's default emphasis color, not tied to
+// "All" reads as the accent/cream primary-action treatment (not tied to
 // any type); a custom-type chip gets its deterministic hash-based color
 // (see getCustomTypeColor) so the same custom type reads the same color
 // here as it does on its cards and detail page.
 function getChipColors(filter: TypeFilter | null): ChipColors {
   if (!filter) {
-    return { background: colors.textPrimary, text: colors.cream };
+    return { background: colors.accent, text: colors.cream };
   }
   if (filter.kind === 'builtin') {
     return getItemTypeColor(filter.value);
